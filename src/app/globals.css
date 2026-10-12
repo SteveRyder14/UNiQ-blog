@@ -1,0 +1,1203 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Chakra Petch", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Spline Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  --color-ink-950: #06090d;
+  --color-ink-900: #0a0f15;
+  --color-ink-850: #0e141c;
+  --color-ink-800: #121a24;
+  --color-ink-700: #1a2431;
+  --color-line: #1d2733;
+  --color-line-2: #2c3a4b;
+  --color-fog: #e8eef4;
+  --color-mist: #94a5b7;
+  --color-dim: #5c6e80;
+  --color-phos: #c6f05a;
+  --color-phos-dim: #94bd42;
+  --color-ember: #ffb454;
+  --color-sky: #7cd5ff;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+}
+
+body {
+  background-color: var(--color-ink-950);
+  color: var(--color-fog);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* film-grain noise overlay */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+::selection {
+  background: var(--color-phos);
+  color: #0a0f15;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2c3a4b #0a0f15;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0f15;
+}
+::-webkit-scrollbar-thumb {
+  background: #2c3a4b;
+  border: 2px solid #0a0f15;
+}
+
+/* ================================================================
+   THE MOTION LANGUAGE
+   One easing, three durations, consistent offsets. Every animation
+   in the app speaks the same dialect; no random 200ms hovers.
+   ================================================================ */
+
+:root {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-quad: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-snap: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-1: 180ms;
+  --dur-2: 320ms;
+  --dur-3: 520ms;
+  --dur-4: 820ms;
+}
+
+/* ---------- keyframes ---------- */
+
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+.marquee-track { animation: marquee 42s linear infinite; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+
+@keyframes caret-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.caret { animation: caret-blink 1.05s steps(1) infinite; }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+.pulse-dot { animation: pulse-dot 2.4s ease-in-out infinite; }
+
+@keyframes breathe {
+  0%, 100% {
+    opacity: 0.55;
+    transform: translate(-50%, 0) scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: translate(-50%, 0) scale(1.06);
+  }
+}
+.breathe {
+  animation: breathe 7s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+.page-shell {
+  animation: page-in var(--dur-3) var(--ease-out-expo) both;
+}
+
+/* ---------- scroll-reveal (rv) ---------- */
+
+.rv {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity var(--dur-4) var(--ease-out-quint),
+    transform var(--dur-4) var(--ease-out-quint);
+  will-change: transform, opacity;
+}
+.rv.rv-left { transform: translateX(-22px); }
+.rv.rv-right { transform: translateX(22px); }
+.rv.rv-fade  { transform: none; }
+.rv.on {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- uncover (clip-path wipe reveal) ----------
+   Content is hidden behind a moving clip edge and wiped into view.
+   The end state uses a negative inset so borders/glows are never clipped. */
+.rv.rv-uncover {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(0 0 100% 0);
+  -webkit-clip-path: inset(0 0 100% 0);
+  will-change: clip-path;
+  transition: clip-path 920ms var(--ease-out-expo);
+}
+/* end state is inset(0) (border box) rather than a negative inset:
+   negative values can be dropped by some engines, which would leave the
+   content permanently clipped and invisible. */
+.rv.rv-uncover.on {
+  clip-path: inset(0 0 0 0);
+  -webkit-clip-path: inset(0 0 0 0);
+}
+
+/* thin phosphor rule that sweeps down the reveal edge — used on cover art */
+.sweep-line {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+.sweep-line::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -2%;
+  height: 1px;
+  opacity: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(198, 240, 90, 0.85) 45%,
+    rgba(255, 180, 84, 0.7) 70%,
+    transparent
+  );
+  box-shadow: 0 0 14px rgba(198, 240, 90, 0.55);
+}
+/* only sweep once the parent Reveal has fired, so mid-page covers don't
+   animate before the reader ever sees them */
+.rv.on .sweep-line::after {
+  animation: sweep-down 1.9s var(--ease-out-quint) 260ms both;
+}
+@keyframes sweep-down {
+  0%   { top: -2%;   opacity: 0; }
+  12%  { opacity: 1; }
+  82%  { opacity: 1; }
+  100% { top: 102%;  opacity: 0; }
+}
+
+/* ---------- site vignette ----------
+   A fixed, click-through overlay that darkens the frame edges so the
+   centre of the page reads clean. Sits above content (z-30) but below
+   the header (z-50) and scroll-top button (z-40). */
+.vignette-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 128% 105% at 50% 42%,
+      transparent 50%,
+      rgba(4, 7, 11, 0.18) 78%,
+      rgba(4, 7, 11, 0.4) 100%
+    ),
+    linear-gradient(to bottom, rgba(4, 7, 11, 0.26) 0%, transparent 12%),
+    linear-gradient(to top, rgba(4, 7, 11, 0.3) 0%, transparent 14%);
+}
+/* fade the vignette in gently on first paint */
+@keyframes vignette-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.vignette-layer {
+  animation: vignette-in 1.2s var(--ease-out-quint) both;
+}
+
+/* ---------- no-JS safety net ----------
+   Reveal/uncover start hidden and rely on JS to clear that state. If the
+   browser has scripting disabled, everything must stay fully visible. */
+@media (scripting: none) {
+  .rv {
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+    -webkit-clip-path: none;
+    transition: none;
+  }
+  .rv.stagger > * {
+    opacity: 1;
+    transform: none;
+  }
+  .sweep-line {
+    display: none;
+  }
+  .hero-head {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ================================================================
+   EXTRA POLISH — transform/opacity only (GPU-cheap, compositor-only)
+   ================================================================ */
+
+/* ---------- hero title: word-by-word rise ---------- */
+.hero-head {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(14px);
+  filter: blur(3px);
+  transition:
+    opacity 760ms var(--ease-out-quint),
+    transform 760ms var(--ease-out-expo),
+    filter 760ms var(--ease-out-quint);
+  will-change: transform, opacity, filter;
+}
+.hero-head.on {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+.hero-head.delay-1 { transition-delay: 90ms; }
+.hero-head.delay-2 { transition-delay: 180ms; }
+.hero-head.delay-3 { transition-delay: 270ms; }
+.hero-head.delay-4 { transition-delay: 360ms; }
+
+/* ---------- terminal: caret drift + boot flash ---------- */
+@keyframes caret-drift {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-1px); }
+  100% { transform: translateY(0); }
+}
+.term-caret {
+  animation: caret-drift 2.6s ease-in-out infinite;
+}
+@keyframes boot-flash {
+  0%   { opacity: 0; }
+  8%   { opacity: 1; }
+  100% { opacity: 1; }
+}
+.boot-flash {
+  animation: boot-flash 600ms var(--ease-out-quint) both;
+}
+
+/* ---------- ticker: edge fade mask ---------- */
+.ticker-fade {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    #000 6%,
+    #000 94%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    #000 6%,
+    #000 94%,
+    transparent 100%
+  );
+}
+
+/* ---------- hover lift micro-interaction (cards, chips, links) ---------- */
+.lift {
+  transition:
+    transform 360ms var(--ease-out-expo),
+    box-shadow 360ms var(--ease-out-expo),
+    border-color 240ms var(--ease-snap);
+  will-change: transform;
+}
+.lift:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 18px 40px -24px rgba(0, 0, 0, 0.85),
+    0 0 0 1px rgba(198, 240, 90, 0.06);
+}
+.lift:active { transform: translateY(-1px); }
+
+/* ---------- icon nudge on hover ---------- */
+.nudge {
+  transition: transform 320ms var(--ease-out-expo);
+}
+.group:hover .nudge {
+  transform: translateX(4px);
+}
+
+/* ---------- like burst ring ---------- */
+@keyframes like-burst {
+  0%   { transform: scale(1);    opacity: 0.9; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+
+/* ================================================================
+   MAX MOTION LAYER — still compositor-only (transform/opacity/filter)
+   ================================================================ */
+
+/* ---------- gentle float (hero terminal) ---------- */
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+.float-slow {
+  animation: float-y 7.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* ---------- rotating border beam ---------- */
+@keyframes beam-spin {
+  to { transform: rotate(1turn); }
+}
+.border-beam {
+  position: relative;
+  isolation: isolate;
+}
+.border-beam::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 300deg,
+    rgba(198, 240, 90, 0.75) 330deg,
+    rgba(124, 213, 255, 0.5) 345deg,
+    transparent 360deg
+  );
+  animation: beam-spin 6s linear infinite;
+}
+.border-beam::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: #070b10;
+}
+
+/* ---------- CRT flicker (very subtle) ---------- */
+@keyframes crt-flicker {
+  0%, 100% { opacity: 1; }
+  97%      { opacity: 1; }
+  97.5%    { opacity: 0.94; }
+  98%      { opacity: 1; }
+  99%      { opacity: 0.97; }
+}
+.crt { animation: crt-flicker 8s step-end infinite; }
+
+/* ---------- bright scanline sweeping the terminal ---------- */
+@keyframes scan-sweep {
+  0%   { transform: translateY(-110%); opacity: 0; }
+  8%   { opacity: 0.5; }
+  92%  { opacity: 0.5; }
+  100% { transform: translateY(1100%); opacity: 0; }
+}
+.scan-beam {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 10%;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(198, 240, 90, 0.05),
+    transparent
+  );
+  animation: scan-sweep 9s linear infinite;
+}
+
+/* ---------- text shimmer for section labels ---------- */
+@keyframes shimmer-pan {
+  0%   { background-position: -180% 0; }
+  100% { background-position: 180% 0; }
+}
+.shimmer {
+  background: linear-gradient(
+    100deg,
+    var(--color-dim) 42%,
+    var(--color-phos) 50%,
+    var(--color-dim) 58%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: shimmer-pan 5.5s ease-in-out infinite;
+}
+
+/* ---------- animated gradient on headline accent ---------- */
+@keyframes gradient-pan {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+.gradient-anim {
+  background-size: 220% 220% !important;
+  animation: gradient-pan 5s ease-in-out infinite;
+}
+
+/* ---------- ping rings on status dots ---------- */
+.ping-wrap { position: relative; display: inline-flex; }
+.ping-wrap::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 9999px;
+  border: 1px solid rgba(198, 240, 90, 0.7);
+  animation: ping-ring 2.2s var(--ease-out-quint) infinite;
+}
+@keyframes ping-ring {
+  0%   { transform: scale(0.6); opacity: 0.9; }
+  80%, 100% { transform: scale(2.4); opacity: 0; }
+}
+
+/* ---------- hue drift on hairlines ---------- */
+@keyframes hue-drift {
+  0%, 100% { filter: hue-rotate(0deg); }
+  50%      { filter: hue-rotate(40deg); }
+}
+.hairline { animation: hue-drift 9s ease-in-out infinite; }
+
+/* ---------- icon wiggle / spin ---------- */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg) scale(1.1); }
+  25%      { transform: rotate(-7deg) scale(1.12); }
+  75%      { transform: rotate(7deg) scale(1.12); }
+}
+.group:hover .icon-wiggle {
+  animation: wiggle 480ms var(--ease-snap) both;
+}
+
+/* ---------- 3D tilt on post cards ---------- */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .tilt-wrap { perspective: 900px; }
+  .tilt {
+    transform:
+      rotateX(calc((var(--myn, 50) - 50) * -0.06deg))
+      rotateY(calc((var(--mxn, 50) - 50) * 0.08deg));
+    transition: transform 240ms var(--ease-out-quint);
+    will-change: transform;
+  }
+  .tilt-wrap:not(:hover) .tilt {
+    transform: rotateX(0) rotateY(0);
+    transition: transform 600ms var(--ease-out-expo);
+  }
+}
+
+/* ---------- floating particles (pure CSS, no JS loop) ---------- */
+.particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.particle {
+  position: absolute;
+  bottom: -4px;
+  width: 3px;
+  height: 3px;
+  border-radius: 9999px;
+  background: rgba(198, 240, 90, 0.5);
+  box-shadow: 0 0 8px rgba(198, 240, 90, 0.5);
+  opacity: 0;
+  animation: rise linear infinite;
+}
+.particle:nth-child(2n) {
+  background: rgba(124, 213, 255, 0.4);
+  box-shadow: 0 0 8px rgba(124, 213, 255, 0.4);
+  width: 2px;
+  height: 2px;
+}
+.particle:nth-child(3n) {
+  background: rgba(255, 180, 84, 0.35);
+  box-shadow: 0 0 6px rgba(255, 180, 84, 0.35);
+}
+@keyframes rise {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  8%   { opacity: 0.9; }
+  90%  { opacity: 0.25; }
+  100% { transform: translateY(-110vh) translateX(var(--sway, 20px)); opacity: 0; }
+}
+
+/* ---------- header wordmark glitch on hover ---------- */
+@keyframes glitch-shift {
+  0%, 100% { text-shadow: none; transform: none; }
+  20% { text-shadow: -2px 0 rgba(255, 180, 84, 0.8), 2px 0 rgba(124, 213, 255, 0.8); transform: translateX(1px); }
+  40% { text-shadow: 2px 0 rgba(255, 180, 84, 0.6), -2px 0 rgba(124, 213, 255, 0.6); transform: translateX(-1px); }
+  60% { text-shadow: -1px 0 rgba(198, 240, 90, 0.7), 1px 0 rgba(124, 213, 255, 0.7); transform: none; }
+}
+.glitch-hover:hover {
+  animation: glitch-shift 360ms steps(2) both;
+}
+
+/* ---------- underline draw for inline article links ---------- */
+.md a {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 320ms var(--ease-out-expo);
+}
+.md a:hover { background-size: 100% 1px; }
+
+/* ---------- blockquote pulse edge ---------- */
+@keyframes edge-glow {
+  0%, 100% { box-shadow: inset 2px 0 0 var(--color-phos); }
+  50%      { box-shadow: inset 2px 0 0 var(--color-phos), inset 5px 0 14px -8px rgba(198, 240, 90, 0.7); }
+}
+.md blockquote { animation: edge-glow 4.5s ease-in-out infinite; }
+
+/* ---------- code block header dots pulse ---------- */
+@keyframes dot-cycle {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+.code-block .code-head span:last-child {
+  animation: dot-cycle 3s ease-in-out infinite;
+}
+
+/* ---------- scroll-top hover spin ---------- */
+.scroll-top-btn:hover svg { transform: rotate(-90deg) scale(1.06); }
+.scroll-top-btn svg { transition: transform 500ms var(--ease-out-expo); }
+
+/* ---------- chip pop ---------- */
+@keyframes chip-pop {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+.chip:active { animation: chip-pop 260ms var(--ease-snap); }
+
+/* ---------- max-motion reduced-motion kill switch ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .float-slow,
+  .border-beam::before,
+  .crt,
+  .scan-beam,
+  .shimmer,
+  .gradient-anim,
+  .ping-wrap::after,
+  .hairline,
+  .icon-wiggle,
+  .particle,
+  .glitch-hover:hover,
+  .md blockquote,
+  .code-block .code-head span:last-child,
+  .chip:active {
+    animation: none !important;
+  }
+  .shimmer {
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    color: var(--color-dim);
+  }
+  .tilt { transform: none !important; }
+  .scroll-top-btn:hover svg { transform: none; }
+  .md a { transition: none; }
+}
+
+/* ---------- gradient hairline divider ---------- */
+.hairline {
+  position: relative;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(198, 240, 90, 0.35) 30%,
+    rgba(124, 213, 255, 0.28) 55%,
+    rgba(255, 180, 84, 0.3) 78%,
+    transparent
+  );
+}
+
+/* ---------- soft glow behind primary buttons ---------- */
+.glow {
+  box-shadow: 0 0 0 1px rgba(198, 240, 90, 0.18),
+    0 8px 26px -14px rgba(198, 240, 90, 0.45);
+}
+.group:hover .glow,
+.glow:hover {
+  box-shadow: 0 0 0 1px rgba(198, 240, 90, 0.3),
+    0 10px 34px -12px rgba(198, 240, 90, 0.6);
+}
+
+/* ---------- article cover: subtle inner vignette + hover glow ---------- */
+.cover-frame {
+  position: relative;
+}
+.cover-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(198, 240, 90, 0);
+  transition: box-shadow 420ms var(--ease-out-quint);
+}
+.cover-frame:hover::after {
+  box-shadow: inset 0 0 0 1px rgba(198, 240, 90, 0.22);
+}
+
+/* ---------- reduced motion: clear every new animation ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .hero-head {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+  .term-caret,
+  .boot-flash {
+    animation: none !important;
+  }
+  .lift,
+  .nudge,
+  .glow,
+  .cover-frame::after {
+    transition: none;
+  }
+}
+
+/* staggered children — a rv.stagger parent reveals its kids in order */
+.rv.stagger.on > * {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--dur-3) var(--ease-out-quint),
+    transform var(--dur-3) var(--ease-out-expo);
+}
+.rv.stagger > * {
+  opacity: 0;
+  transform: translateY(14px);
+  transition-delay: 0ms;
+}
+.rv.stagger.on > *:nth-child(1) { transition-delay: 60ms; }
+.rv.stagger.on > *:nth-child(2) { transition-delay: 120ms; }
+.rv.stagger.on > *:nth-child(3) { transition-delay: 180ms; }
+.rv.stagger.on > *:nth-child(4) { transition-delay: 240ms; }
+.rv.stagger.on > *:nth-child(5) { transition-delay: 300ms; }
+.rv.stagger.on > *:nth-child(6) { transition-delay: 360ms; }
+.rv.stagger.on > *:nth-child(7) { transition-delay: 420ms; }
+.rv.stagger.on > *:nth-child(n+8) { transition-delay: 480ms; }
+
+@keyframes kenburns {
+  0% { transform: scale(1.02) translateY(0); }
+  100% { transform: scale(1.09) translateY(-1.2%); }
+}
+.kenburns {
+  animation: kenburns 22s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* ---------- focus / selection polish ---------- */
+
+:focus-visible {
+  outline: 1px solid var(--color-phos);
+  outline-offset: 3px;
+}
+
+/* ---------- photo / card motion (explicit props, not transition-all) ---------- */
+
+.photo {
+  filter: brightness(1.04) contrast(0.86) saturate(0.95);
+  transition:
+    transform 700ms var(--ease-out-expo),
+    filter 700ms var(--ease-out-expo),
+    opacity 400ms var(--ease-out-quint);
+}
+.group:hover .photo {
+  filter: brightness(1.12) contrast(0.74) saturate(1.04);
+}
+
+.post-card {
+  transition:
+    transform var(--dur-3) var(--ease-out-expo),
+    border-color var(--dur-2) var(--ease-snap),
+    box-shadow var(--dur-3) var(--ease-out-expo),
+    background-color var(--dur-2) var(--ease-snap);
+  will-change: transform;
+}
+.post-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 1px solid transparent;
+  background:
+    radial-gradient(
+      120% 120% at var(--mx, 50%) var(--my, 0%),
+      rgba(198, 240, 90, 0.11),
+      transparent 55%
+    );
+  opacity: 0;
+  transition:
+    opacity var(--dur-2) var(--ease-snap),
+    border-color var(--dur-2) var(--ease-snap);
+}
+.post-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(198, 240, 90, 0.45);
+  box-shadow:
+    0 28px 60px -28px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(198, 240, 90, 0.08),
+    0 0 40px -18px rgba(198, 240, 90, 0.35);
+}
+.post-card:hover::after {
+  opacity: 1;
+  border-color: rgba(198, 240, 90, 0.22);
+}
+/* disable hover lifts on touch / reduced-motion */
+@media (hover: none) {
+  .post-card:hover { transform: none; box-shadow: none; }
+  .post-card:hover::after { opacity: 0; }
+}
+
+/* ---------- nav link underline (smoothly eases in from left) ---------- */
+
+.navlink {
+  position: relative;
+  transition: color var(--dur-2) var(--ease-snap);
+}
+.navlink::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  height: 1px;
+  width: 100%;
+  background: var(--color-phos);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform var(--dur-2) var(--ease-out-expo);
+}
+.navlink:hover::after,
+.navlink.active::after {
+  transform: scaleX(1);
+}
+.navlink:not(:hover):not(.active)::after {
+  transform-origin: right;
+}
+
+/* ---------- buttons ---------- */
+
+.btn,
+button[type="submit"] {
+  transition:
+    transform var(--dur-1) var(--ease-out-expo),
+    background-color var(--dur-2) var(--ease-snap),
+    color var(--dur-2) var(--ease-snap),
+    border-color var(--dur-2) var(--ease-snap),
+    box-shadow var(--dur-2) var(--ease-out-expo);
+}
+.btn:active,
+button[type="submit"]:active {
+  transform: translateY(1px);
+}
+.btn:hover,
+button[type="submit"]:not(:disabled):hover {
+  box-shadow: 0 10px 30px -12px rgba(198, 240, 90, 0.35);
+}
+
+/* sheen sweep on primary buttons */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.28) 50%,
+    transparent 70%
+  );
+  transform: translateX(-110%);
+  transition: transform 800ms var(--ease-out-quint);
+  z-index: -1;
+}
+.btn-primary:hover::before { transform: translateX(110%); }
+
+/* ---------- filter chips ---------- */
+
+.chip {
+  transition:
+    background-color var(--dur-2) var(--ease-snap),
+    color var(--dur-2) var(--ease-snap),
+    border-color var(--dur-2) var(--ease-snap),
+    transform var(--dur-1) var(--ease-out-expo);
+}
+.chip:hover { transform: translateY(-1px); }
+.chip:active { transform: translateY(0); }
+
+/* ---------- count-up numbers ---------- */
+
+.countup {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- approach step line animation on About ---------- */
+
+.approach-row {
+  position: relative;
+  transition: background-color var(--dur-2) var(--ease-snap);
+}
+.approach-row::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: var(--color-phos);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-3) var(--ease-out-expo);
+}
+.rv.on .approach-row::before,
+.approach-row:hover::before {
+  transform: scaleX(1);
+}
+
+/* ---------- TOC active item ---------- */
+
+.toc-link {
+  position: relative;
+  transition:
+    background-color var(--dur-2) var(--ease-snap),
+    color var(--dur-2) var(--ease-snap),
+    padding var(--dur-2) var(--ease-snap);
+}
+.toc-link[data-active="true"] {
+  color: var(--color-phos);
+  background-color: rgba(198, 240, 90, 0.06);
+  padding-left: 16px;
+}
+.toc-link[data-active="true"]::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--color-phos);
+  transform: translateY(-50%);
+  box-shadow: 0 0 10px rgba(198, 240, 90, 0.5);
+}
+
+/* ---------- comment row entrance ---------- */
+
+@keyframes comment-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+.comment-new {
+  animation: comment-in 420ms var(--ease-out-expo) both;
+}
+
+/* ---------- back-to-top / scroll progress ---------- */
+
+.rp-fill {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset 120ms linear;
+}
+
+/* Graph-paper grid backdrop.
+   The fade lives on a ::before layer so it masks ONLY the grid lines —
+   previously mask-image applied to the whole section, which also clipped
+   children (the phosphor glow, borders) and read as a black vignette on
+   the left/top edges. The falloff now only starts far out at the corners. */
+.grid-bg {
+  position: relative;
+}
+.grid-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(148, 165, 183, 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 165, 183, 0.055) 1px, transparent 1px);
+  background-size: 46px 46px;
+  -webkit-mask-image: radial-gradient(
+    ellipse 130% 120% at 50% 0%,
+    #000 55%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 130% 120% at 50% 0%,
+    #000 55%,
+    transparent 100%
+  );
+}
+
+/* Photo treatment: lifts crushed blacks out of pure black so dark regions
+   read as ink rather than dead holes, and warms up further on hover so
+   the dark side visibly clears when the image animates. */
+.photo {
+  filter: brightness(1.04) contrast(0.86) saturate(0.95);
+}
+.group:hover .photo {
+  filter: brightness(1.12) contrast(0.74) saturate(1.02);
+}
+
+/* CRT scanlines for the terminal card */
+.scanlines::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(6, 9, 13, 0.22) 0px,
+    rgba(6, 9, 13, 0.22) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* ---------- article (markdown) typography ---------- */
+
+.md {
+  font-size: 1.035rem;
+  line-height: 1.85;
+  color: #c3cfdb;
+}
+.md > * + * {
+  margin-top: 1.15rem;
+}
+.md h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.55rem;
+  letter-spacing: 0.01em;
+  color: var(--color-fog);
+  margin-top: 2.6rem;
+  scroll-margin-top: 90px;
+  position: relative;
+  padding-left: 1rem;
+}
+.md h2::before {
+  content: "##";
+  position: absolute;
+  left: -1.1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-phos);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
+.md h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.18rem;
+  color: var(--color-fog);
+  margin-top: 2rem;
+  scroll-margin-top: 90px;
+}
+.md h3::before {
+  content: "###";
+  font-family: var(--font-mono);
+  color: var(--color-ember);
+  margin-right: 0.5rem;
+  font-size: 0.78rem;
+}
+.md p {
+  margin: 0;
+}
+.md a {
+  color: var(--color-sky);
+  text-decoration: underline;
+  text-decoration-color: rgba(124, 213, 255, 0.35);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s;
+}
+.md a:hover {
+  text-decoration-color: var(--color-sky);
+}
+.md ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.md ul li {
+  position: relative;
+  padding-left: 1.4rem;
+}
+.md ul li::before {
+  content: "▸";
+  position: absolute;
+  left: 0.15rem;
+  color: var(--color-phos);
+}
+.md ol {
+  list-style: none;
+  counter-reset: step;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.md ol li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 2.1rem;
+}
+.md ol li::before {
+  content: counter(step, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 0.12rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--color-ember);
+}
+.md blockquote {
+  border-left: 2px solid var(--color-phos);
+  background: linear-gradient(
+    90deg,
+    rgba(198, 240, 90, 0.06),
+    transparent 70%
+  );
+  padding: 0.9rem 1.3rem;
+  color: var(--color-fog);
+  font-style: italic;
+}
+.md blockquote p + p {
+  margin-top: 0.6rem;
+}
+.md hr {
+  border: none;
+  margin: 2.6rem 0;
+  text-align: center;
+}
+.md hr::after {
+  content: "· · ·";
+  font-family: var(--font-mono);
+  color: var(--color-dim);
+  letter-spacing: 0.6em;
+}
+
+.inline-code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: rgba(198, 240, 90, 0.09);
+  color: var(--color-phos);
+  border: 1px solid rgba(198, 240, 90, 0.22);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.code-block {
+  border: 1px solid var(--color-line);
+  background: #070b10;
+  margin: 1.5rem 0 0;
+  overflow: hidden;
+}
+.code-block .code-head {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-dim);
+  background: var(--color-ink-850);
+  border-bottom: 1px solid var(--color-line);
+  padding: 0.45rem 0.9rem;
+}
+.code-block pre {
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  line-height: 1.7;
+  color: #b8c8d8;
+}
+.code-block pre .tok-c {
+  color: #54657a;
+}
+
+/* underline-slide link for nav */
+.navlink {
+  position: relative;
+}
+.navlink::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  height: 1px;
+  width: 100%;
+  background: var(--color-phos);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+.navlink:hover::after,
+.navlink.active::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .rv {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .rv.rv-uncover {
+    clip-path: none;
+    -webkit-clip-path: none;
+  }
+  .marquee-track,
+  .kenburns,
+  .sweep-line::after,
+  .breathe {
+    animation: none !important;
+  }
+  .sweep-line {
+    display: none;
+  }
+  .caret,
+  .pulse-dot {
+    animation: none !important;
+    opacity: 1;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
