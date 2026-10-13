@@ -1,4 +1,3 @@
-
 import { randomUUID } from "node:crypto";
 import pg from "pg";
 
@@ -71,29 +70,46 @@ Recent Git commits:
 ${JSON.stringify(commitSummary, null, 2)}
 `;
 
-const aiResponse = await fetch(
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-goog-api-key": GEMINI_API_KEY,
-    },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: {
-        responseMimeType: "application/json",
-        temperature: 0.3,
-        maxOutputTokens: 2500,
-      },
-    }),
-  },
-);
+let aiResponse;
 
-if (!aiResponse.ok) {
-  throw new Error(
-    `Gemini request failed: ${aiResponse.status} ${await aiResponse.text()}`,
+for (let attempt = 0; attempt < 4; attempt++) {
+  aiResponse = await fetch(
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": GEMINI_API_KEY,
+      },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: "application/json",
+          temperature: 0.3,
+          maxOutputTokens: 2500,
+        },
+      }),
+    },
   );
+
+  if (aiResponse.ok) break;
+
+  const retryable = [408, 429, 500, 502, 503, 504]
+    .includes(aiResponse.status);
+
+  if (!retryable || attempt === 3) {
+    throw new Error(
+      `Gemini request failed: ${aiResponse.status} ${await aiResponse.text()}`
+    );
+  }
+
+  const delay = 1000 * 2 ** attempt + Math.floor(Math.random() * 500);
+
+  console.warn(
+    `Gemini returned ${aiResponse.status}. Retrying in about ${Math.ceil(delay / 1000)} seconds...`
+  );
+
+  await new Promise((resolve) => setTimeout(resolve, delay));
 }
 
 const aiData = await aiResponse.json();
