@@ -1,24 +1,42 @@
+<<<<<<< HEAD
 name: Automatic Game Development Updates
+=======
+
+name: Automatic Blog Updates
+>>>>>>> fa7e4ed620ab5ba2bfaa52dc38a0cbc1930f1223
 
 on:
   workflow_dispatch:
   schedule:
+<<<<<<< HEAD
     # 09:00 India Standard Time (03:30 UTC)
+=======
+>>>>>>> fa7e4ed620ab5ba2bfaa52dc38a0cbc1930f1223
     - cron: "30 3 * * *"
 
 permissions:
   contents: read
 
 concurrency:
+<<<<<<< HEAD
   group: automatic-game-development-updates
+=======
+  group: automatic-blog-updates
+>>>>>>> fa7e4ed620ab5ba2bfaa52dc38a0cbc1930f1223
   cancel-in-progress: false
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+<<<<<<< HEAD
     steps:
       - name: Get blog repository code
+=======
+
+    steps:
+      - name: Get repository code
+>>>>>>> fa7e4ed620ab5ba2bfaa52dc38a0cbc1930f1223
         uses: actions/checkout@v4
 
       - name: Set up Node.js
@@ -30,9 +48,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+<<<<<<< HEAD
       - name: Generate and publish game-hub development update
+=======
+      - name: Generate and publish post
+>>>>>>> fa7e4ed620ab5ba2bfaa52dc38a0cbc1930f1223
         run: node scripts/auto-post.mjs
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+<<<<<<< HEAD
           SOURCE_REPOSITORY: SteveRyder14/game-hub
+=======
+          GITHUB_REPOSITORY: ${{ github.repository }}
+>>>>>>> fa7e4ed620ab5ba2bfaa52dc38a0cbc1930f1223
