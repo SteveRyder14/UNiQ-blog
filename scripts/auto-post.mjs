@@ -165,7 +165,7 @@ try {
         article.title.trim(),
         article.excerpt.trim(),
         article.content.trim(),
-        "",
+        "/images/cover-checkers.jpg",
         String(article.topic || "Game Development"),
         article.tags.map(String).slice(0, 8),
         false,

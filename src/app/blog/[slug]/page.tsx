@@ -95,7 +95,7 @@ export default async function PostPage({ params }: Params) {
             <figure className="relative mb-10 overflow-hidden border border-line">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={post.cover}
+                src={post.cover || "/images/cover-checkers.jpg"}
                 alt={post.title}
                 className="photo kenburns aspect-[16/8] w-full object-cover opacity-95"
               />
@@ -207,7 +207,7 @@ export default async function PostPage({ params }: Params) {
           <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
             <Reveal>
               <p className="shimmer font-mono text-[12px] uppercase tracking-[0.3em]">
-                <span className="text-phos">//</span> keep reading
+                <span className="text-phos">{"//"}</span> keep reading
               </p>
             </Reveal>
             <Reveal

@@ -62,7 +62,7 @@ Do **not** commit your `.env` file or paste the database URL into source code, s
 
 ## Automatic game-hub articles
 
-The GitHub Actions workflow in `.github/workflows/auto-post.yml` checks `SteveRyder14/game-hub` each day at 09:00 India Standard Time. When that repository has commits from the last seven days, it asks Gemini to draft an evidence-based development update and inserts it into the same PostgreSQL `posts` table used by the site. The home page and archive read from the database at request time, so a published post appears without rebuilding the site. A commit-based slug prevents the same update from being inserted twice.
+The GitHub Actions workflow in `.github/workflows/auto-post.yml` checks `SteveRyder14/game-hub` each day at 09:00 India Standard Time. When that repository has commits from the last seven days, it asks Gemini to draft an evidence-based development update and inserts it into the same PostgreSQL `posts` table used by the site. The home page and archive read from the database at request time, so a published post appears without rebuilding the site. A commit-based slug prevents the same update from being inserted twice. These posts use `public/images/cover-checkers.jpg`; existing posts with an empty cover use it as a display fallback too.
 
 In **UNiQ-blog → Settings → Secrets and variables → Actions**, add these repository secrets:
 

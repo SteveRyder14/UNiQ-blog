@@ -130,7 +130,7 @@ function PostCard({
           <div className={cn("relative overflow-hidden border-b border-line", big ? "aspect-[21/9]" : "aspect-[16/8]")}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={post.cover}
+              src={post.cover || "/images/cover-checkers.jpg"}
               alt={post.title}
               loading="lazy"
               className="photo h-full w-full object-cover opacity-85 group-hover:scale-[1.04]"
