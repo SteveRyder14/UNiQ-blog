@@ -60,6 +60,18 @@ Then test locally with `npm run dev`. Check the blog, a post detail page, commen
 
 Do **not** commit your `.env` file or paste the database URL into source code, screenshots, public issues, or chat. Netlify environment variables are configured in the Netlify dashboard, not in `netlify.toml`.
 
+## Automatic game-hub articles
+
+The GitHub Actions workflow in `.github/workflows/auto-post.yml` checks `SteveRyder14/game-hub` each day at 09:00 India Standard Time. When that repository has commits from the last seven days, it asks Gemini to draft an evidence-based development update and inserts it into the same PostgreSQL `posts` table used by the site. The home page and archive read from the database at request time, so a published post appears without rebuilding the site. A commit-based slug prevents the same update from being inserted twice.
+
+In **UNiQ-blog → Settings → Secrets and variables → Actions**, add these repository secrets:
+
+- `GEMINI_API_KEY` — an API key for the Gemini API.
+- `DATABASE_URL` — the production Neon connection string for the blog database. The `posts` table must already exist.
+- `SOURCE_REPOSITORY_TOKEN` — only needed if `SteveRyder14/game-hub` is private. Use a token that can read that repository; leave this secret unset for a public repository.
+
+After saving the secrets, open **Actions → Automatic Game Development Updates → Run workflow** to try it immediately. The run log reports whether it published a post, found no recent commits, or skipped commits that did not support a useful article. GitHub may delay scheduled runs, and scheduled workflows only run from the repository's default branch.
+
 ## Scripts
 
 - `npm run dev` — local development server
