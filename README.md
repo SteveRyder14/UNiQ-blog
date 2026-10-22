@@ -72,6 +72,8 @@ In **UNiQ-blog → Settings → Secrets and variables → Actions**, add these r
 
 After saving the secrets, open **Actions → Automatic Game Development Updates → Run workflow** to try it immediately. The run log reports whether it published a post, found no recent commits, or skipped commits that did not support a useful article. GitHub may delay scheduled runs, and scheduled workflows only run from the repository's default branch.
 
+To run the publisher locally, copy `.env.example` to `.env` and set `DATABASE_URL` and `GEMINI_API_KEY`. Then run `npm run auto-post -- --check-env` to confirm both are loaded without contacting GitHub, Gemini, or the database. Run `npm run auto-post -- --dry-run` to generate and preview an article without inserting it. Run `npm run auto-post` to publish it to the database. The publisher only finds commits from the previous seven days; `SOURCE_REPOSITORY_TOKEN` is also needed locally if the source repo is private.
+
 ## Scripts
 
 - `npm run dev` — local development server
