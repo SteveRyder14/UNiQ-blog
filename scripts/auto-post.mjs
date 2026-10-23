@@ -1,7 +1,37 @@
 import "dotenv/config";
 import pg from "pg";
+import https from "node:https";
 
 const { Client } = pg;
+
+// Avoid Node's fetch/Undici keep-alive shutdown assertion on Windows when a
+// run exits early (for example, when GitHub has no recent commits).
+function getJson(url, headers) {
+  return new Promise((resolve, reject) => {
+    const request = https.get(url, { headers, agent: false }, (response) => {
+      const chunks = [];
+      response.on("data", (chunk) => chunks.push(chunk));
+      response.on("end", () => {
+        const text = Buffer.concat(chunks).toString("utf8");
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (error) {
+          reject(error);
+          return;
+        }
+        resolve({ ok: (response.statusCode ?? 500) < 300, status: response.statusCode ?? 500, text, data });
+      });
+      response.on("error", (error) => {
+        reject(error);
+      });
+    });
+    request.on("error", (error) => {
+      reject(error);
+    });
+  });
+}
+
 async function main() {
   const {
     GEMINI_API_KEY,
@@ -41,14 +71,12 @@ const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 const repoUrl =
   `https://api.github.com/repos/${SOURCE_REPOSITORY}/commits` +
   `?since=${encodeURIComponent(since.toISOString())}&per_page=10`;
-const githubResponse = await fetch(repoUrl, {
-  headers: {
+const githubResponse = await getJson(repoUrl, {
     Accept: "application/vnd.github+json",
     "User-Agent": "UNiQ-blog-development-updater",
     ...(SOURCE_REPOSITORY_TOKEN
       ? { Authorization: `Bearer ${SOURCE_REPOSITORY_TOKEN}` }
       : {}),
-  },
 });
 
 if (!githubResponse.ok) {
@@ -57,7 +85,7 @@ if (!githubResponse.ok) {
   );
 }
 
-const commits = await githubResponse.json();
+const commits = githubResponse.data;
 if (!Array.isArray(commits) || commits.length === 0) {
   console.log(
     `No commits in ${SOURCE_REPOSITORY} in the last 7 days. No post created.`,

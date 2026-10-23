@@ -138,11 +138,11 @@ export default function CommandPalette() {
       <button
         onClick={() => setOpen(true)}
         aria-label="Open command palette"
-        className="hidden items-center gap-2 border border-line bg-ink-900/70 px-2.5 py-1.5 font-mono text-[11px] text-dim transition-colors hover:border-phos/50 hover:text-phos sm:flex"
+        className="flex h-10 w-10 items-center justify-center gap-2 rounded-full border border-line bg-ink-900/80 text-dim shadow-sm transition-all hover:-translate-y-0.5 hover:border-line-2 hover:text-fog sm:w-auto sm:justify-start sm:px-3.5"
       >
         <span aria-hidden>⌕</span>
-        <span className="tracking-wider">search</span>
-        <kbd className="ml-1 border border-line-2 px-1 py-px text-[10px] text-dim">
+        <span className="hidden text-xs font-medium sm:inline">Search</span>
+        <kbd className="ml-1 hidden rounded-full border border-line bg-ink-850 px-2 py-0.5 font-mono text-[9px] text-dim md:inline">
           ⌘K
         </kbd>
       </button>
@@ -158,15 +158,14 @@ export default function CommandPalette() {
             aria-label="Close search"
             tabIndex={-1}
             onClick={() => setOpen(false)}
-            className="absolute inset-0 cursor-default bg-ink-950/80 backdrop-blur-sm"
-            style={{ animation: "vignette-in 180ms ease-out both" }}
+            className="command-backdrop absolute inset-0 cursor-default bg-[#0d1710]/35 backdrop-blur-sm"
           />
           <div
-            className="scanlines relative w-full max-w-xl border border-line-2 bg-[#070b10] shadow-[0_40px_120px_-30px_rgba(0,0,0,0.95)]"
+            className="cmdk-panel relative w-full max-w-xl overflow-hidden rounded-[24px] border border-line-2 bg-ink-900 shadow-[0_35px_90px_-35px_rgba(23,25,20,0.65)]"
             style={{ animation: "page-in 220ms var(--ease-out-expo) both" }}
           >
-            <div className="flex items-center gap-3 border-b border-line px-4 py-3">
-              <span className="font-mono text-[13px] text-phos">$</span>
+            <div className="flex items-center gap-3 border-b border-line px-5 py-4">
+              <span className="font-mono text-[13px] text-phos">⌕</span>
               <input
                 ref={inputRef}
                 value={q}

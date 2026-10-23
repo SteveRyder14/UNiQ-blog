@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { cn, fmtDate } from "@/lib/utils";
 
-
 export type CommentItem = {
   id: number;
   name: string;
@@ -25,30 +24,36 @@ export default function CommentSection({
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
     setErr("");
+
     if (name.trim().length < 2 || body.trim().length < 2) {
-      setErr("both handle and message need a few characters");
+      setErr("Please add your name and a comment.");
       return;
     }
+
     setBusy(true);
     try {
-      const res = await fetch("/api/comments", {
+      const response = await fetch("/api/comments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ postId, name: name.trim(), body: body.trim() }),
+        body: JSON.stringify({
+          postId,
+          name: name.trim(),
+          body: body.trim(),
+        }),
       });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setErr(data.error ?? "could not post — try again");
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        setErr(data.error ?? "Could not post your comment. Please try again.");
         return;
       }
-            setComments((c) => [...c, { ...data.comment, _new: true }]);
-            setName("");
-            setBody("");
+      setComments((current) => [...current, { ...data.comment, _new: true }]);
+      setName("");
+      setBody("");
     } catch {
-      setErr("network hiccup — try again");
+      setErr("Network error. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -56,65 +61,100 @@ export default function CommentSection({
 
   return (
     <section className="mt-16 border-t border-line pt-10">
-      <h2 className="flex items-center gap-3 font-display text-xl font-semibold text-fog">
-        <span className="font-mono text-sm text-phos">//</span> transmission log
-        <span className="font-mono text-[12px] font-normal tracking-[0.2em] text-dim">
-          [{comments.length}]
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-phos">
+            Discussion
+          </p>
+          <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-fog">
+            Comments
+          </h2>
+        </div>
+        <span className="rounded-full border border-line bg-ink-900 px-3 py-1.5 text-xs font-medium text-dim">
+          {comments.length} {comments.length === 1 ? "comment" : "comments"}
         </span>
-      </h2>
+      </div>
 
-      <div className="mt-7 space-y-5">
+      <div className="mt-7 space-y-4">
         {comments.length === 0 && (
-          <div className="border border-dashed border-line-2 px-5 py-8 text-center font-mono text-[12.5px] text-dim">
-            no transmissions yet — be the first to reply to this one.
+          <div className="rounded-3xl border border-dashed border-line-2 bg-ink-900/50 px-6 py-10 text-center">
+            <p className="font-display text-xl font-semibold text-fog">No comments yet</p>
+            <p className="mt-1 text-sm text-mist">Start the conversation below.</p>
           </div>
         )}
-        {comments.map((c) => (
-          <article key={c.id} className={cn("border border-line bg-ink-900/70 p-4 sm:p-5", c._new && "comment-new")}>
-            <div className="flex flex-wrap items-center gap-3 font-mono text-[11.5px]">
-              <span className="text-phos">{c.name}</span>
-              <span className="text-dim">@</span>
-              <span className="text-dim">{fmtDate(c.createdAt)}</span>
-              <span className="ml-auto text-[10px] uppercase tracking-[0.2em] text-dim">
-                inbound
+
+        {comments.map((comment) => (
+          <article
+            key={comment.id}
+            className={cn(
+              "rounded-3xl border border-line bg-ink-900 p-5 sm:p-6",
+              comment._new && "comment-new",
+            )}
+          >
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span className="grid h-9 w-9 place-items-center rounded-full bg-phos/10 font-display text-sm font-bold text-phos">
+                {comment.name.charAt(0).toUpperCase()}
               </span>
+              <div>
+                <p className="text-sm font-semibold text-fog">{comment.name}</p>
+                <p className="text-xs text-dim">{fmtDate(comment.createdAt)}</p>
+              </div>
             </div>
-            <p className="mt-2.5 text-[0.95rem] leading-relaxed text-mist">{c.body}</p>
+            <p className="mt-4 whitespace-pre-wrap text-[15px] leading-7 text-mist">
+              {comment.body}
+            </p>
           </article>
         ))}
       </div>
 
-      <form onSubmit={submit} className="mt-8 border border-line bg-ink-950 p-4 sm:p-5">
-        <p className="font-mono text-[11px] uppercase tracking-[0.24em] text-dim">
-          <span className="text-phos">$</span> reply to this note
+      <form
+        onSubmit={submit}
+        className="mt-8 rounded-[28px] border border-line bg-ink-900 p-5 sm:p-7"
+      >
+        <h3 className="font-display text-2xl font-semibold text-fog">Leave a comment</h3>
+        <p className="mt-1 text-sm text-mist">
+          Plain text only. No account and no tracking.
         </p>
-        <div className="mt-4 grid gap-4 sm:grid-cols-[200px_1fr]">
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="handle"
-            maxLength={40}
-            className="border border-line bg-ink-900 px-3.5 py-2.5 font-mono text-[13px] text-fog placeholder:text-dim focus:border-phos/60 focus:outline-none"
-          />
-          <textarea
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            placeholder="your transmission… (plain text only)"
-            rows={3}
-            maxLength={1200}
-            className="resize-y border border-line bg-ink-900 px-3.5 py-2.5 text-[0.95rem] leading-relaxed text-fog placeholder:text-dim focus:border-phos/60 focus:outline-none"
-          />
+
+        <div className="mt-6 grid gap-4">
+          <label className="block">
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-dim">
+              Name
+            </span>
+            <input
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Your name"
+              maxLength={40}
+              className="w-full rounded-2xl border border-line bg-ink-950 px-4 py-3 text-sm text-fog placeholder:text-dim focus:border-phos focus:outline-none sm:max-w-xs"
+            />
+          </label>
+
+          <label className="block">
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-dim">
+              Comment
+            </span>
+            <textarea
+              value={body}
+              onChange={(event) => setBody(event.target.value)}
+              placeholder="Share a thought, correction or question…"
+              rows={4}
+              maxLength={1200}
+              className="w-full resize-y rounded-2xl border border-line bg-ink-950 px-4 py-3 text-[15px] leading-6 text-fog placeholder:text-dim focus:border-phos focus:outline-none"
+            />
+          </label>
         </div>
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-          <p className={cn("font-mono text-[11.5px]", err ? "text-ember" : "text-dim")}>
-            {err ? `err: ${err}` : "kept local. no accounts, no tracking."}
+
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+          <p className={cn("text-xs", err ? "text-ember" : "text-dim")} role="status">
+            {err || "Comments are stored locally in this site's database."}
           </p>
           <button
             type="submit"
             disabled={busy}
-            className="btn border border-phos bg-phos/10 px-5 py-2.5 font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-phos hover:bg-phos hover:text-ink-950 disabled:opacity-50"
+            className="rounded-full bg-fog px-5 py-3 text-sm font-semibold text-ink-950 transition-colors hover:bg-phos disabled:opacity-50"
           >
-            {busy ? "transmitting…" : "transmit →"}
+            {busy ? "Posting…" : "Post comment"}
           </button>
         </div>
       </form>

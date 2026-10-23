@@ -11,58 +11,50 @@ export const metadata: Metadata = {
   description: "Browse every topic tag across the field notes.",
 };
 
-/** Scale tag size by how often it is used — a tidy weighted cloud. */
-function sizeFor(count: number, max: number): string {
-  const r = max <= 1 ? 1 : count / max;
-  if (r > 0.75) return "text-2xl sm:text-3xl";
-  if (r > 0.5) return "text-xl sm:text-2xl";
-  if (r > 0.25) return "text-lg sm:text-xl";
-  return "text-base";
-}
-
 export default async function TagsPage() {
   const tags = await getTagCounts();
-  const max = tags[0]?.count ?? 1;
 
   return (
-    <main className="pt-14">
-      <section className="grid-bg border-b border-line">
-        <div className="mx-auto max-w-6xl px-4 pb-12 pt-14 sm:px-6">
-          <Reveal variant="uncover">
-            <p className="shimmer font-mono text-[12px] uppercase tracking-[0.3em]">
-              <span className="text-phos">//</span> ~/tags
-            </p>
-            <h1 className="mt-4 font-display text-4xl font-semibold tracking-tight text-fog sm:text-5xl">
-              Browse by tag
-            </h1>
-            <p className="mt-4 max-w-xl leading-relaxed text-mist">
-              {tags.length} tags across the archive. Bigger means I kept coming
-              back to it.
-            </p>
-          </Reveal>
-        </div>
+    <main className="pt-[72px]">
+      <section className="mx-auto max-w-[1280px] px-5 pb-14 pt-16 sm:px-8 lg:pt-24">
+        <Reveal>
+          <p className="cmd-type font-mono text-[10px] uppercase tracking-[0.26em] text-phos">
+            <span aria-hidden="true">$</span> find ./journal -type tag
+          </p>
+          <h1 className="mt-5 max-w-3xl font-display text-[clamp(3rem,7vw,5.8rem)] font-semibold leading-[0.92] tracking-[-0.045em] text-fog">
+            Browse by interest.
+          </h1>
+          <p className="mt-6 max-w-xl text-lg leading-8 text-mist">
+            {tags.length} tags connect the journal. Start with a system, a tool
+            or a recurring curiosity.
+          </p>
+        </Reveal>
       </section>
 
-      <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-        <Reveal stagger className="flex flex-wrap items-baseline gap-x-4 gap-y-4">
-          {tags.map((t) => (
+      <section className="mx-auto max-w-[1280px] px-5 pb-20 sm:px-8">
+        <Reveal stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {tags.map((tag) => (
             <Link
-              key={t.tag}
-              href={`/tags/${encodeURIComponent(t.tag)}`}
-              className={`lift group inline-flex items-baseline gap-2 border border-line bg-ink-900/60 px-4 py-2.5 font-display font-medium text-fog transition-colors duration-300 hover:border-phos/50 hover:text-phos ${sizeFor(
-                t.count,
-                max,
-              )}`}
+              key={tag.tag}
+              href={`/tags/${encodeURIComponent(tag.tag)}`}
+              className="group flex items-center justify-between gap-5 rounded-[24px] border border-line bg-ink-900 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-line-2 hover:shadow-[0_22px_45px_-34px_rgba(8,22,14,0.5)]"
             >
-              <span className="font-mono text-[0.6em] text-dim group-hover:text-phos/70">
-                #
+              <span>
+                <span className="font-mono text-xs text-phos">#</span>
+                <span className="ml-1 font-display text-2xl font-semibold tracking-tight text-fog group-hover:text-phos">
+                  {tag.tag}
+                </span>
+                <span className="mt-1 block text-sm text-mist">
+                  {tag.count} {tag.count === 1 ? "note" : "notes"}
+                </span>
               </span>
-              {t.tag}
-              <span className="font-mono text-[0.55em] text-dim">{t.count}</span>
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-line text-phos transition-all group-hover:border-phos group-hover:bg-phos group-hover:text-ink-950">
+                →
+              </span>
             </Link>
           ))}
         </Reveal>
-      </div>
+      </section>
 
       <SubscribeBand />
     </main>

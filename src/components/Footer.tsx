@@ -1,96 +1,81 @@
 import Link from "next/link";
+import Logo from "./Logo";
 import { IconGitHub } from "./icons";
+
+const NAV = [
+  ["Journal", "/"],
+  ["Archive", "/archive"],
+  ["Topics", "/tags"],
+  ["About", "/about"],
+] as const;
 
 export default function Footer() {
   return (
-    <footer className="border-t border-line bg-ink-950">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-3">
-        <div>
-          <p className="font-mono text-[13px] text-mist">
-            <span className="text-phos">UNiQ</span>
-            <span className="text-dim">@</span>
-            <span className="text-fog">blog</span>
-            <span className="text-dim">:~$</span>
-          </p>
-          <p className="mt-4 max-w-xs font-display text-sm font-medium uppercase leading-relaxed tracking-[0.14em] text-mist">
-            Build it. Break it.
-            <br />
-            <span className="text-phos">Understand it.</span>
-            <br />
-            Make it better.
-          </p>
-        </div>
-        <div>
-          <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-dim">
-            ./map
-          </p>
-          <ul className="mt-4 space-y-2.5 font-mono text-[12.5px]">
-            <li>
-              <Link href="/" className="text-mist transition-colors hover:text-phos">
-                <span className="text-dim">~/</span>blog
-              </Link>
-            </li>
-            <li>
-              <Link href="/archive" className="text-mist transition-colors hover:text-phos">
-                <span className="text-dim">~/</span>archive
-              </Link>
-            </li>
-            <li>
-              <Link href="/tags" className="text-mist transition-colors hover:text-phos">
-                <span className="text-dim">~/</span>tags
-              </Link>
-            </li>
-            <li>
-              <Link href="/about" className="text-mist transition-colors hover:text-phos">
-                <span className="text-dim">~/</span>about
-              </Link>
-            </li>
-            <li>
-              <a href="/rss.xml" className="text-mist transition-colors hover:text-phos">
-                <span className="text-dim">~/</span>rss
+    <footer className="theme-footer bg-[#0d1710] text-[#f4f8f3]">
+      <div className="mx-auto max-w-[1280px] px-5 py-14 sm:px-8 lg:py-20">
+        <div className="grid gap-12 lg:grid-cols-[1.35fr_0.7fr_0.7fr]">
+          <div>
+            <Link href="/" className="inline-flex items-center gap-3">
+              <span className="footer-badge grid h-12 w-12 place-items-center rounded-2xl">
+                <Logo animated className="h-9 w-9" />
+              </span>
+              <span>
+                <span className="block font-display text-xl font-semibold">UNiQ</span>
+                <span className="mt-0.5 block font-mono text-[8.5px] uppercase tracking-[0.22em] text-[#a7aa9d]">
+                  Notes from under the hood
+                </span>
+              </span>
+            </Link>
+            <p className="mt-6 max-w-md text-sm leading-7 text-[#b9bcb0]">
+              A personal technical journal about Android, Linux, local AI,
+              audio, repair, and understanding systems instead of merely using
+              them.
+            </p>
+          </div>
+
+          <nav aria-label="Footer navigation">
+            <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-[#8f937f]">
+              Explore
+            </p>
+            <ul className="mt-5 space-y-3 text-sm">
+              {NAV.map(([label, href]) => (
+                <li key={href}>
+                  <Link href={href} className="text-[#d8dacd] transition-colors hover:text-white">
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-[#8f937f]">
+              Connect
+            </p>
+            <div className="mt-5 flex flex-col items-start gap-3 text-sm">
+              <a
+                href="https://github.com/SteveRyder14"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 text-[#d8dacd] transition-colors hover:text-white"
+              >
+                <IconGitHub className="h-4 w-4" />
+                SteveRyder14 on GitHub
               </a>
-            </li>
-            <li>
-                <a
-                  href="https://github.com/SteveRyder14"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="nudge inline-flex items-center gap-2 text-mist transition-colors hover:text-phos"
-                >
-                  <span className="text-dim">~/</span>github
-                  <IconGitHub className="h-3.5 w-3.5" />
-                </a>
-            </li>
-          </ul>
+              <a href="/rss.xml" className="text-[#d8dacd] transition-colors hover:text-white">
+                RSS feed
+              </a>
+              <span className="inline-flex items-center gap-2 text-[#a7aa9d]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#a9d95d]" />
+                Always learning
+              </span>
+            </div>
+          </div>
         </div>
-        <div>
-          <p className="font-mono text-[11px] uppercase tracking-[0.28em] text-dim">
-            ./system
-          </p>
-          <ul className="mt-4 space-y-2.5 font-mono text-[12px] leading-relaxed text-dim">
-            <li>
-              stack: <span className="text-mist">next.js 16 · postgres · drizzle</span>
-            </li>
-            <li>
-              privacy: <span className="text-phos">no trackers, no cookies</span>
-            </li>
-            <li>
-              status:{" "}
-              <span className="ping-wrap align-middle">
-                <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-phos" />
-              </span>{" "}
-              <span className="text-mist">always learning</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div className="border-t border-line">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-4 font-mono text-[11px] text-dim sm:px-6">
-          <span>© 2026 UNiQ — notes from the terminal</span>
-          <span>
-            <span className="text-phos">$</span> logout
-            <span className="ml-2 text-dim">— nah. it&rsquo;s a blog.</span>
-          </span>
+
+        <div className="mt-14 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-6 font-mono text-[9px] uppercase tracking-[0.18em] text-[#8f937f]">
+          <span>© 2026 UNiQ</span>
+          <span>Build · Break · Understand · Improve</span>
         </div>
       </div>
     </footer>

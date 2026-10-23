@@ -1,105 +1,173 @@
 import Link from "next/link";
 import Hero from "@/components/Hero";
-import Ticker from "@/components/Ticker";
+import StatusStrip from "@/components/StatusStrip";
+import Marquee from "@/components/Marquee";
 import PostExplorer from "@/components/PostExplorer";
+import TrendingNotes from "@/components/TrendingNotes";
+import TopicGrid from "@/components/TopicGrid";
 import SubscribeBand from "@/components/SubscribeBand";
 import Reveal from "@/components/Reveal";
-import { getPosts } from "@/lib/posts";
+import DecodeText from "@/components/DecodeText";
+import { getCuratedFeed, getTagCounts } from "@/lib/posts";
 
 export const dynamic = "force-dynamic";
 
-const TINKERING = [
-  "android — custom ROMs, root, Magisk, system-level tweaks",
-  "local AI — Salvy, a desktop assistant on Ollama",
-  "linux — the terminal as a front door, not a fallback",
-  "audio — the rest of the life, outside the terminal",
+const FOCUS = [
+  {
+    id: "01",
+    title: "Android",
+    text: "ROMs, root, Magisk and the boot chain beneath the interface.",
+  },
+  {
+    id: "02",
+    title: "Local AI",
+    text: "Useful assistants and agents that stay on hardware I control.",
+  },
+  {
+    id: "03",
+    title: "Linux",
+    text: "Systems, services, networking and knowing what the machine is doing.",
+  },
+  {
+    id: "04",
+    title: "Audio",
+    text: "Self-hosted music, practical gear and repair over replacement.",
+  },
 ];
 
 export default async function Home() {
-  const posts = await getPosts();
+  const [curated, tags] = await Promise.all([getCuratedFeed(), getTagCounts()]);
+  const latest = curated.feed[0];
 
   return (
     <main>
-      <Hero postCount={posts.length} />
-      <Ticker />
+      <Hero postCount={curated.total} />
+      <StatusStrip latest={latest ? latest.title : "in progress"} />
+      <Marquee />
 
-      {/* latest */}
-      <section id="latest" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-16 sm:px-6 lg:py-20">
-        <Reveal variant="uncover">
-          <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
+      <section
+        id="latest"
+        className="mx-auto max-w-[1280px] scroll-mt-24 px-5 py-20 sm:px-8 lg:py-24"
+      >
+        <Reveal>
+          <div className="mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="shimmer font-mono text-[12px] uppercase tracking-[0.3em]">
-                <span className="text-phos">//</span> the archive
+              <p className="cmd-type font-mono text-[10px] font-medium uppercase tracking-[0.26em] text-phos">
+                The journal
               </p>
-              <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-fog sm:text-4xl">
-                Field notes &amp; experiments
+              <h2 className="mt-4 font-display text-5xl font-semibold tracking-[-0.04em] text-fog sm:text-6xl">
+                <DecodeText text="Recent field notes" />
               </h2>
             </div>
-            <p className="max-w-xs font-mono text-[11.5px] leading-relaxed text-dim">
-              every entry: a thing I built, broke, opened up, and fixed —
-              written down before I forget why.
-            </p>
+            <div className="max-w-sm md:text-right">
+              <p className="text-[15px] leading-7 text-mist">
+                Selected notes, experiments and the useful lessons that appear
+                when something stops working.
+              </p>
+              <p className="mt-3 inline-flex items-center gap-2 rounded-full border border-line bg-ink-900 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-dim">
+                <span className="status-dot" aria-hidden="true" />
+                {curated.feed.length} curated
+                {curated.hidden > 0 && (
+                  <span className="text-mist">· {curated.hidden} in archive</span>
+                )}
+              </p>
+            </div>
           </div>
         </Reveal>
-        <PostExplorer posts={posts} />
+
+        <PostExplorer posts={curated.feed} />
+
+        <Reveal>
+          <div className="mt-10 flex flex-wrap items-center justify-between gap-4 rounded-[22px] border border-line bg-ink-900/60 px-5 py-4">
+            <p className="text-sm text-mist">
+              The latest notes lead here, and older posts remain easy to find
+              in the complete archive.
+            </p>
+            <Link
+              href="/archive"
+              className="group inline-flex items-center gap-2 text-sm font-semibold text-phos transition-colors hover:text-fog"
+            >
+              Open the full archive
+              <span className="transition-transform group-hover:translate-x-1" aria-hidden="true">
+                →
+              </span>
+            </Link>
+          </div>
+        </Reveal>
       </section>
 
-      {/* whoami teaser */}
-      <section className="border-t border-line bg-ink-900/40">
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-12 lg:py-24">
-          <Reveal className="lg:col-span-5">
-            <div className="group relative mx-auto max-w-sm">
-              <div className="absolute -left-2 -top-2 h-6 w-6 border-l-2 border-t-2 border-phos" />
-              <div className="absolute -right-2 -top-2 h-6 w-6 border-r-2 border-t-2 border-phos" />
-              <div className="absolute -bottom-2 -left-2 h-6 w-6 border-b-2 border-l-2 border-phos" />
-              <div className="absolute -bottom-2 -right-2 h-6 w-6 border-b-2 border-r-2 border-phos" />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+      <TrendingNotes posts={curated.trending} />
+      <TopicGrid tags={tags} />
+
+      <section className="border-b border-line">
+        <div className="mx-auto grid max-w-[1280px] gap-14 px-5 py-20 sm:px-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-center lg:py-24">
+          <Reveal>
+            <div className="relative mx-auto max-w-[520px]">
+              <div className="overflow-hidden rounded-[32px] border border-line-2 bg-ink-900 p-2 shadow-[0_28px_60px_-38px_rgba(8,22,14,0.55)]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/avatar.jpg"
-                  alt="UNiQ at the desk, late-night build in progress"
-                  className="photo w-full border border-line object-cover opacity-95 transition-all duration-700 group-hover:opacity-100"
+                  alt="A developer at a computer with green terminal screens"
                   loading="lazy"
+                  className="aspect-[4/5] w-full rounded-[25px] object-cover"
                 />
-              <div className="absolute bottom-3 left-3 bg-ink-950/85 px-2.5 py-1.5 font-mono text-[10.5px] tracking-wider text-phos">
-                $ uptime: always curious
+              </div>
+              <div className="mx-5 -mt-12 rounded-3xl border border-line bg-ink-900/95 p-5 shadow-[0_22px_45px_-32px_rgba(8,22,14,0.55)] backdrop-blur sm:mx-8">
+                <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-phos">
+                  Working principle
+                </p>
+                <p className="mt-2 font-display text-[1.35rem] font-semibold leading-snug text-fog">
+                  Understand the layer beneath the layer.
+                </p>
               </div>
             </div>
           </Reveal>
-          <Reveal delay={120} variant="uncover" className="lg:col-span-7">
-            <p className="shimmer font-mono text-[12px] uppercase tracking-[0.3em]">
-              <span className="text-phos">//</span> whoami
-            </p>
-            <h2 className="mt-4 font-display text-3xl font-semibold leading-tight tracking-tight text-fog sm:text-4xl">
-              A developer who likes understanding things{" "}
-              <span className="text-phos">deeply</span>.
-            </h2>
-            <p className="mt-5 max-w-2xl leading-relaxed text-mist">
-              I don&rsquo;t follow tutorials to finish projects — I follow them
-              until they break, then I open the hood. If a custom ROM, a kernel
-              flag, or a 7-billion-parameter model doesn&rsquo;t explain itself,
-              it hasn&rsquo;t taught me anything yet.
-            </p>
-            <Reveal stagger variant="fade" className="mt-7 grid gap-3 sm:grid-cols-2" as="ul">
-              {TINKERING.map((t, i) => (
-                <li
-                  key={i}
-                  className="flex items-start gap-3 border border-line bg-ink-950/60 px-4 py-3 font-mono text-[12px] leading-relaxed text-mist transition-colors duration-300 ease-out hover:border-phos/40"
+
+          <div>
+            <Reveal>
+              <p className="cmd-type font-mono text-[10px] font-medium uppercase tracking-[0.26em] text-phos">
+                What I explore
+              </p>
+              <h2 className="mt-4 max-w-2xl font-display text-5xl font-semibold leading-[0.98] tracking-[-0.04em] text-fog">
+                <DecodeText text="Curiosity is useful when it leaves notes behind." />
+              </h2>
+              <p className="mt-6 max-w-2xl text-[15px] leading-8 text-mist">
+                This is a working record—not a highlight reel. It keeps the
+                reasoning, trade-offs and fixes close to the things being built,
+                so future-me can understand past-me.
+              </p>
+            </Reveal>
+
+            <Reveal stagger className="mt-10 grid gap-px overflow-hidden rounded-[24px] border border-line bg-line sm:grid-cols-2">
+              {FOCUS.map((item) => (
+                <article
+                  key={item.id}
+                  className="group bg-ink-900 p-6 transition-colors duration-300 hover:bg-ink-850"
                 >
-                  <span className="text-ember transition-transform duration-200 ease-out group-hover:translate-x-0.5">▸</span>
-                  <span>{t}</span>
-                </li>
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[10px] tracking-[0.18em] text-dim">
+                      {item.id}
+                    </span>
+                    <span className="h-2 w-2 rounded-full bg-phos/30 transition-colors group-hover:bg-phos" />
+                  </div>
+                  <h3 className="mt-8 font-display text-2xl font-semibold text-fog">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-mist">{item.text}</p>
+                </article>
               ))}
             </Reveal>
+
             <Link
               href="/about"
-              className="group mt-8 inline-flex items-center gap-3 font-mono text-[12px] uppercase tracking-[0.22em] text-phos"
+              className="group mt-8 inline-flex items-center gap-3 text-sm font-semibold text-fog"
             >
-              <span className="border-b border-phos/50 pb-0.5 transition-colors group-hover:border-phos">
-                cat ./about.md
+              More about UNiQ
+              <span className="grid h-8 w-8 place-items-center rounded-full bg-fog text-ink-950 transition-all group-hover:translate-x-1 group-hover:bg-phos">
+                →
               </span>
-              <span className="transition-transform group-hover:translate-x-1">→</span>
             </Link>
-          </Reveal>
+          </div>
         </div>
       </section>
 

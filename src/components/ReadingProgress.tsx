@@ -19,7 +19,7 @@ export default function ReadingProgress() {
   return (
     <div className="fixed inset-x-0 top-0 z-[60] h-[3px] bg-transparent">
       <div
-        className="h-full bg-phos shadow-[0_0_12px_rgba(198,240,90,0.7)] transition-[width] duration-150 ease-out"
+        className="h-full bg-phos transition-[width] duration-150 ease-out"
         style={{ width: `${p * 100}%` }}
         aria-hidden="true"
       />

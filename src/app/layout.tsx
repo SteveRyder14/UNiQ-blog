@@ -1,35 +1,39 @@
 import type { Metadata, Viewport } from "next";
-import { Chakra_Petch, Spline_Sans, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Inter, JetBrains_Mono } from "next/font/google";
+import Script from "next/script";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollTop from "@/components/ScrollTop";
-import Vignette from "@/components/Vignette";
+import IntroSplash from "@/components/IntroSplash";
+import CursorEffects from "@/components/CursorEffects";
+import LightAtmosphere from "@/components/LightAtmosphere";
+import HudOverlay from "@/components/HudOverlay";
 import "./globals.css";
 
-const chakra = Chakra_Petch({
+const fraunces = Fraunces({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
-  variable: "--font-chakra-petch",
+  variable: "--font-fraunces",
   display: "swap",
 });
 
-const spline = Spline_Sans({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  variable: "--font-spline-sans",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-inter",
   display: "swap",
 });
 
 const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
+  weight: ["400", "500", "600"],
   variable: "--font-jetbrains-mono",
   display: "swap",
 });
 
 export const metadata: Metadata = {
   title: {
-    default: "UNiQ — under the hood",
+    default: "UNiQ — notes from under the hood",
     template: "%s · UNiQ",
   },
   description:
@@ -37,8 +41,34 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#06090d",
+  themeColor: "#0a0d09",
 };
+
+const themeInitScript = `
+  (function () {
+    var root = document.documentElement;
+    try {
+      // UNiQ is a dark-mode journal by default. A visitor choice is still
+      // respected, but there is no system-preference fallback.
+      var stored = window.localStorage.getItem("uniq-theme");
+      var theme = stored === "light" ? "light" : "dark";
+      root.dataset.theme = theme;
+      root.style.colorScheme = theme;
+    } catch (error) {
+      root.dataset.theme = "dark";
+      root.style.colorScheme = "dark";
+    }
+    try {
+      // Brand intro: once per browser session, never for reduced motion.
+      if (!window.sessionStorage.getItem("uniq-splash")) {
+        window.sessionStorage.setItem("uniq-splash", "1");
+        if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          root.dataset.splash = "on";
+        }
+      }
+    } catch (error) {}
+  })();
+`;
 
 export default function RootLayout({
   children,
@@ -46,13 +76,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${chakra.variable} ${spline.variable} ${jetbrains.variable}`}>
+    <html
+      lang="en"
+      data-theme="dark"
+      suppressHydrationWarning
+      className={`${fraunces.variable} ${inter.variable} ${jetbrains.variable}`}
+    >
       <body>
+        <Script id="theme-init" strategy="beforeInteractive">
+          {themeInitScript}
+        </Script>
+        <LightAtmosphere />
+        <IntroSplash />
         <Header />
         {children}
         <Footer />
         <ScrollTop />
-        <Vignette />
+        <HudOverlay />
+        <CursorEffects />
       </body>
     </html>
   );

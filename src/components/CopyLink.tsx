@@ -25,7 +25,7 @@ export default function CopyLink({ url }: { url: string }) {
   return (
     <button
       onClick={copy}
-      className="flex items-center gap-2 border border-line px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-mist transition-colors hover:border-phos/60 hover:text-phos"
+      className="flex items-center gap-2 rounded-full border border-line bg-ink-900 px-4 py-2.5 text-xs font-semibold text-mist transition-colors hover:border-phos/60 hover:text-phos"
     >
       {copied ? (
         <>

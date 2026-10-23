@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import SubscribeBand from "@/components/SubscribeBand";
 import Reveal from "@/components/Reveal";
 import {
+  IconBrain,
+  IconGitHub,
+  IconNetwork,
   IconPhone,
   IconTerminal,
-  IconBrain,
-  IconNetwork,
   IconWave,
   IconWrench,
-  IconGitHub,
 } from "@/components/icons";
 
 export const metadata: Metadata = { title: "about" };
@@ -17,296 +18,285 @@ const TOPICS = [
   {
     icon: IconPhone,
     title: "Android internals",
-    body: "Custom ROMs, root, Magisk, and system-level tweaks. I want to know what the boot process is doing, not just what the settings screen says.",
-    accent: "text-ember",
+    body: "Custom ROMs, root, Magisk and system-level tweaks. I want to know what the boot process is doing—not just what the settings screen says.",
+    accent: "text-ember bg-ember/10",
   },
   {
     icon: IconTerminal,
     title: "Linux & systems",
-    body: "The terminal as a front door, not a fallback. init systems, DNS disasters, systemd units — the unglamorous parts are where the learning is.",
-    accent: "text-sky",
+    body: "The terminal as a front door, not a fallback. Services, DNS, logs and the unglamorous parts where the real learning happens.",
+    accent: "text-sky bg-sky/10",
   },
   {
     icon: IconBrain,
     title: "Local AI agents",
-    body: "Salvy is the flagship: a desktop assistant on Ollama that opens apps, reads the screen, and runs gated shell commands — with zero data leaving the house.",
-    accent: "text-phos",
+    body: "Salvy is the flagship: an Ollama-powered desktop assistant that opens apps, reads the screen and runs gated commands locally.",
+    accent: "text-phos bg-phos/10",
   },
   {
     icon: IconNetwork,
     title: "Networking & privacy",
-    body: "What leaves my machine, and why. Open source, self-hosting, and knowing the path a packet takes from keyboard to nowhere-in-particular.",
-    accent: "text-sky",
+    body: "What leaves my machine, and why. Open source, self-hosting and understanding the path data takes.",
+    accent: "text-sky bg-sky/10",
   },
   {
     icon: IconWave,
     title: "Music & audio",
-    body: "Outside the terminal. FLACs over a home network, gear that was fixed instead of replaced, and sound that isn't someone's listening data.",
-    accent: "text-ember",
+    body: "Outside the terminal: self-hosted FLACs, practical gear, and sound that does not become someone else's listening data.",
+    accent: "text-ember bg-ember/10",
   },
   {
     icon: IconWrench,
     title: "Budget builds & repair",
-    body: "Practical, cheap ways to build and improve things. A $200 laptop, an old mini PC, a soldering iron — constraints make the projects honest.",
-    accent: "text-phos",
+    body: "Practical, inexpensive ways to build and improve things. Constraints make projects more honest.",
+    accent: "text-phos bg-phos/10",
   },
 ];
 
 const APPROACH = [
   {
     n: "01",
-    t: "BUILD IT",
-    d: "Make the thing exist. Ugly is fine. A running sketch beats a perfect plan.",
+    title: "Build it",
+    text: "Make the thing exist. Ugly is fine; a running sketch beats a perfect plan.",
   },
   {
     n: "02",
-    t: "BREAK IT",
-    d: "Push it until it fails. The failure is the most useful output of the whole project.",
+    title: "Break it",
+    text: "Push until it fails. The failure is often the most useful output.",
   },
   {
     n: "03",
-    t: "UNDERSTAND IT",
-    d: "Open the hood. Read the logs, the source, the boot sequence — until the failure has a name.",
+    title: "Understand it",
+    text: "Open the hood. Read the logs, source and boot sequence until the failure has a name.",
   },
   {
     n: "04",
-    t: "MAKE IT BETTER",
-    d: "Ship the fix, write the note, and start again. That loop is the whole identity.",
+    title: "Make it better",
+    text: "Ship the fix, write the note and start the loop again.",
   },
 ];
 
 export default function AboutPage() {
   return (
-    <main className="pt-14">
-        {/* identity */}
-        <section className="grid-bg border-b border-line">
-          <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-12 lg:py-24">
-            <Reveal className="lg:col-span-5">
-              <div className="group relative mx-auto max-w-sm">
-                <div className="absolute -left-2 -top-2 h-6 w-6 border-l-2 border-t-2 border-phos" />
-                <div className="absolute -right-2 -top-2 h-6 w-6 border-r-2 border-t-2 border-phos" />
-                <div className="absolute -bottom-2 -left-2 h-6 w-6 border-b-2 border-l-2 border-phos" />
-                <div className="absolute -bottom-2 -right-2 h-6 w-6 border-b-2 border-r-2 border-phos" />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/avatar.jpg"
-                  alt="UNiQ at the desk"
-                  className="photo w-full border border-line object-cover opacity-95 transition-all duration-700 group-hover:opacity-100"
-                />
-                <div className="absolute bottom-3 left-3 bg-ink-950/85 px-2.5 py-1.5 font-mono text-[10.5px] tracking-wider text-phos">
-                  $ process: always running
-                </div>
-              </div>
-            </Reveal>
-            <Reveal delay={120} className="lg:col-span-7">
-              <p className="shimmer font-mono text-[12px] uppercase tracking-[0.3em]">
-                <span className="text-phos">~/</span>UNiQ — profile
-              </p>
-              <h1 className="mt-4 font-display text-4xl font-semibold tracking-tight text-fog sm:text-5xl">
-                UNiQ
-              </h1>
-              <p className="mt-2 font-mono text-[13px] text-mist">
-                developer in progress <span className="text-dim">|</span> android
-                modding <span className="text-dim">·</span> linux{" "}
-                <span className="text-dim">·</span> local ai
-              </p>
-              <p className="mt-6 max-w-2xl text-[1.02rem] leading-relaxed text-mist">
-                I&rsquo;m a developer who likes understanding things{" "}
-                <strong className="font-medium text-fog">deeply</strong>. Not just
-                making something work, but figuring out{" "}
-                <em>why</em> it works. I learn by building, debugging,
-                experimenting, and fixing things myself — and I prefer the
-                internals over blindly following a tutorial, every time.
-              </p>
-              <p className="mt-4 max-w-2xl text-[1.02rem] leading-relaxed text-mist">
-                I&rsquo;m into programming, Android modding, Linux, local AI, and
-                practical experiments that turn curiosity into something useful.
-                Outside the terminal: music, audio, and finding cheap ways to do
-                expensive things.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <a
-                  href="https://github.com/SteveRyder14"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2.5 border border-phos bg-phos px-5 py-3 font-mono text-[12px] font-medium uppercase tracking-[0.2em] text-ink-950 transition-all hover:bg-transparent hover:text-phos"
-                >
-                  <IconGitHub className="h-4 w-4" /> github/UNiQ
-                </a>
-                <a
-                  href="/"
-                  className="inline-flex items-center gap-2 border border-line-2 px-5 py-3 font-mono text-[12px] uppercase tracking-[0.2em] text-mist transition-colors hover:border-phos/60 hover:text-phos"
-                >
-                  read the notes →
-                </a>
-              </div>
-            </Reveal>
-          </div>
-        </section>
+    <main className="pt-[72px]">
+      <section className="mx-auto grid max-w-[1280px] items-center gap-14 px-5 py-16 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
+        <Reveal>
+          <p className="cmd-type font-mono text-[10px] font-medium uppercase tracking-[0.26em] text-phos">
+            About UNiQ
+          </p>
+          <h1 className="mt-5 font-display text-[clamp(3rem,7vw,6rem)] font-semibold leading-[0.92] tracking-[-0.045em] text-fog">
+            I learn by opening the hood.
+          </h1>
+          <p className="mt-7 max-w-2xl text-lg leading-8 text-mist">
+            I&rsquo;m UNiQ—a developer who likes understanding things deeply.
+            Not just making something work, but figuring out <em>why</em> it
+            works.
+          </p>
+          <p className="mt-5 max-w-2xl text-[15px] leading-8 text-mist">
+            I build, debug, experiment and fix things myself. Tutorials are a
+            starting point, not a substitute for understanding. Most of my
+            projects live somewhere between Android, Linux, local AI, audio
+            and practical repair.
+          </p>
 
-        {/* what I dig into */}
-        <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
-            <Reveal variant="uncover">
-              <p className="shimmer font-mono text-[12px] uppercase tracking-[0.3em]">
-                <span className="text-phos">//</span> what I dig into
+          <div className="mt-9 flex flex-wrap gap-3">
+            <a
+              href="https://github.com/SteveRyder14"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2.5 rounded-full bg-fog px-6 py-3.5 text-sm font-semibold text-ink-950 transition-all hover:-translate-y-0.5 hover:bg-phos"
+            >
+              <IconGitHub className="h-4 w-4" />
+              github.com/SteveRyder14
+            </a>
+            <Link
+              href="/"
+              className="inline-flex items-center rounded-full border border-line-2 bg-ink-900/60 px-6 py-3.5 text-sm font-semibold text-fog transition-all hover:-translate-y-0.5 hover:border-fog"
+            >
+              Read the journal
+            </Link>
+          </div>
+        </Reveal>
+
+        <Reveal delay={120}>
+          <div className="relative mx-auto max-w-[540px]">
+            <div className="overflow-hidden rounded-[32px] border border-line-2 bg-ink-900 p-2 shadow-[0_28px_60px_-38px_rgba(8,22,14,0.55)]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/about-bench.jpg"
+                alt="A phone opened up on the repair bench"
+                className="aspect-[4/5] w-full rounded-[25px] object-cover sm:aspect-[5/5]"
+              />
+            </div>
+            <div className="mx-5 -mt-12 rounded-3xl border border-line bg-ink-900/95 p-5 shadow-[0_22px_45px_-32px_rgba(8,22,14,0.55)] backdrop-blur sm:mx-8">
+              <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-phos">
+                Current focus
               </p>
-              <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-fog sm:text-4xl">
-                The open-hood list
-              </h2>
-            </Reveal>
-          <Reveal
-            stagger
-            variant="up"
-            className="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
-          >
-            {TOPICS.map((t) => (
-              <div
-                key={t.title}
-                className="lift group relative h-full overflow-hidden border border-line bg-ink-900/70 p-6 transition-[border-color,transform,box-shadow] duration-300 ease-out hover:border-phos/40"
-              >
-                <t.icon className={`icon-wiggle h-7 w-7 ${t.accent}`} />
-                <h3 className="mt-4 font-display text-lg font-semibold text-fog transition-colors duration-300 group-hover:text-phos">
-                  {t.title}
-                </h3>
-                <p className="mt-2.5 text-[0.92rem] leading-relaxed text-mist">
-                  {t.body}
+              <p className="mt-2 font-display text-xl font-semibold leading-snug text-fog">
+                Android · Linux · Local AI · Audio
+              </p>
+            </div>
+          </div>
+        </Reveal>
+      </section>
+
+      <section className="border-y border-line bg-ink-900/45">
+        <div className="mx-auto max-w-[1280px] px-5 py-20 sm:px-8 lg:py-24">
+          <Reveal>
+            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="cmd-type font-mono text-[10px] uppercase tracking-[0.26em] text-phos">
+                  Areas of curiosity
                 </p>
+                <h2 className="mt-4 font-display text-5xl font-semibold tracking-[-0.04em] text-fog">
+                  The open-hood list
+                </h2>
               </div>
+              <p className="max-w-sm text-sm leading-6 text-mist md:text-right">
+                Different systems, same habit: follow the signal until the
+                mechanism makes sense.
+              </p>
+            </div>
+          </Reveal>
+
+          <Reveal stagger className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {TOPICS.map((topic) => (
+              <article
+                key={topic.title}
+                className="group rounded-[24px] border border-line bg-ink-900 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-line-2 hover:shadow-[0_22px_45px_-34px_rgba(8,22,14,0.5)]"
+              >
+                <span className={`grid h-12 w-12 place-items-center rounded-2xl ${topic.accent}`}>
+                  <topic.icon className="h-6 w-6" />
+                </span>
+                <h3 className="mt-6 font-display text-2xl font-semibold tracking-tight text-fog">
+                  {topic.title}
+                </h3>
+                <p className="mt-3 text-sm leading-6 text-mist">{topic.body}</p>
+              </article>
             ))}
           </Reveal>
-        </section>
+        </div>
+      </section>
 
-        {/* projects */}
-        <section className="border-y border-line bg-ink-900/40">
-          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
-            <Reveal variant="uncover">
-              <p className="shimmer font-mono text-[12px] uppercase tracking-[0.3em]">
-                <span className="text-phos">//</span> things I&rsquo;ve built
-              </p>
-              <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-fog sm:text-4xl">
-                Running processes
-              </h2>
-            </Reveal>
-            <div className="mt-9 grid gap-5 lg:grid-cols-2">
-              <Reveal>
-                <div className="lift glow group relative h-full overflow-hidden border border-line bg-ink-950 transition-[border-color,box-shadow] duration-300 ease-out hover:border-phos/50">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/images/cover-salvy.jpg"
-                    alt="Salvy workspace"
-                    className="photo aspect-[16/7] w-full object-cover opacity-90 group-hover:scale-[1.03] group-hover:opacity-100"
-                  />
-                  <span className="sweep-line" aria-hidden="true" />
-                  <div className="p-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-display text-xl font-semibold text-fog">
-                        Salvy
-                      </h3>
-                      <span className="border border-phos/40 bg-phos/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.2em] text-phos">
-                        flagship
-                      </span>
-                    </div>
-                    <p className="mt-2.5 text-[0.95rem] leading-relaxed text-mist">
-                      A local desktop AI assistant built around Ollama models.
-                      OCR, app launching, system controls, automation — a
-                      personal agent that stays on my hardware.
-                    </p>
-                    <a
-                      href="/blog/building-salvy"
-                      className="mt-4 inline-block font-mono text-[11.5px] uppercase tracking-[0.2em] text-phos transition-colors hover:text-fog"
-                    >
-                      read the build notes →
-                    </a>
-                  </div>
-                </div>
-              </Reveal>
-              <Reveal delay={100}>
-                <div className="lift glow group relative h-full overflow-hidden border border-line bg-ink-950 transition-[border-color,box-shadow] duration-300 ease-out hover:border-phos/50">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/images/cover-tictactoe.jpg"
-                    alt="Tic-tac-toe on a notepad"
-                    className="photo aspect-[16/7] w-full object-cover opacity-90 group-hover:scale-[1.03] group-hover:opacity-100"
-                  />
-                  <span className="sweep-line" aria-hidden="true" />
-                  <div className="p-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-display text-xl font-semibold text-fog">
-                        Tic-Tac-Toe
-                      </h3>
-                      <span className="border border-ember/40 bg-ember/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.2em] text-ember">
-                        learning vehicle
-                      </span>
-                    </div>
-                    <p className="mt-2.5 text-[0.95rem] leading-relaxed text-mist">
-                      A small game I built myself and published on my website.
-                      Built five times across five stacks — one of my projects
-                      for learning by actually making things.
-                    </p>
-                    <a
-                      href="/blog/tic-tac-toe-five-times"
-                      className="mt-4 inline-block font-mono text-[11.5px] uppercase tracking-[0.2em] text-phos transition-colors hover:text-fog"
-                    >
-                      read the method →
-                    </a>
-                  </div>
-                </div>
-              </Reveal>
-            </div>
-          </div>
-        </section>
+      <section className="mx-auto max-w-[1280px] px-5 py-20 sm:px-8 lg:py-24">
+        <Reveal>
+          <p className="cmd-type font-mono text-[10px] uppercase tracking-[0.26em] text-phos">
+            Selected projects
+          </p>
+          <h2 className="mt-4 font-display text-5xl font-semibold tracking-[-0.04em] text-fog">
+            Things I&rsquo;m building
+          </h2>
+        </Reveal>
 
-        {/* approach */}
-        <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
-          <div className="grid gap-12 lg:grid-cols-12">
-            <Reveal variant="uncover" className="lg:col-span-4">
-              <p className="shimmer font-mono text-[12px] uppercase tracking-[0.3em]">
-                <span className="text-phos">//</span> my approach
-              </p>
-              <h2 className="mt-3 font-display text-3xl font-semibold leading-tight tracking-tight text-fog sm:text-4xl">
-                I don&rsquo;t need to know everything already.
-              </h2>
-              <p className="mt-5 leading-relaxed text-mist">
-                I want to stay curious, understand the problem, test ideas,
-                learn from what breaks, and keep improving. It&rsquo;s a four-step
-                loop, and it has never once needed an update.
-              </p>
-            </Reveal>
-            <div className="lg:col-span-8">
-              <div className="hairline mb-2" aria-hidden="true" />
-              {APPROACH.map((s, i) => (
-                <Reveal key={s.n} delay={i * 90}>
-                  <div className="lift approach-row group flex gap-6 border-b border-line py-7 first:border-t sm:gap-10">
-                    <span className="w-10 shrink-0 font-mono text-sm text-ember">
-                      {s.n}
-                    </span>
-                    <div>
-                      <h3 className="font-display text-2xl font-semibold tracking-wide text-fog transition-colors duration-300 ease-out group-hover:text-phos">
-                        {s.t}
-                      </h3>
-                      <p className="mt-2 max-w-xl leading-relaxed text-mist transition-colors duration-300 ease-out">
-                        {s.d}
-                      </p>
-                    </div>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
-          </div>
+        <div className="mt-10 grid gap-6 lg:grid-cols-2">
+          <ProjectCard
+            image="/images/cover-salvy.jpg"
+            eyebrow="Flagship project"
+            title="Salvy"
+            body="A local desktop AI assistant built around Ollama. OCR, app launching, system controls and automation—without sending personal data to a cloud service."
+            href="/blog/building-salvy"
+            link="Read the build notes"
+          />
+          <ProjectCard
+            image="/images/cover-tictactoe.jpg"
+            eyebrow="Learning project"
+            title="Tic-Tac-Toe, five times"
+            body="The same small game rebuilt across five approaches. A compact way to understand state, rendering and what frameworks actually do."
+            href="/blog/tic-tac-toe-five-times"
+            link="Read the method"
+          />
+        </div>
+      </section>
+
+      <section className="border-t border-line bg-ink-900/45">
+        <div className="mx-auto grid max-w-[1280px] gap-12 px-5 py-20 sm:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:py-24">
           <Reveal>
-            <blockquote className="mt-14 border-l-2 border-phos bg-gradient-to-r from-phos/8 to-transparent px-8 py-8">
-              <p className="font-display text-2xl font-semibold leading-snug tracking-tight text-fog sm:text-3xl">
-                &ldquo;Build it. Break it. Understand it. Make it
-                better.&rdquo;
-              </p>
-              <footer className="mt-3 font-mono text-[12px] text-dim">
-                — always learning, always experimenting
-              </footer>
-            </blockquote>
+            <p className="cmd-type font-mono text-[10px] uppercase tracking-[0.26em] text-phos">
+              My approach
+            </p>
+            <h2 className="mt-4 font-display text-5xl font-semibold leading-[0.98] tracking-[-0.04em] text-fog">
+              I don&rsquo;t need to know everything already.
+            </h2>
+            <p className="mt-6 max-w-md text-[15px] leading-8 text-mist">
+              I need to stay curious, understand the problem, test ideas, learn
+              from what breaks and keep improving.
+            </p>
           </Reveal>
-        </section>
 
-        <SubscribeBand />
+          <div className="divide-y divide-line border-y border-line">
+            {APPROACH.map((step, index) => (
+              <Reveal key={step.n} delay={index * 60}>
+                <div className="group grid gap-3 py-7 sm:grid-cols-[64px_180px_1fr] sm:items-baseline">
+                  <span className="font-mono text-xs text-ember">{step.n}</span>
+                  <h3 className="font-display text-2xl font-semibold text-fog transition-colors group-hover:text-phos">
+                    {step.title}
+                  </h3>
+                  <p className="text-sm leading-6 text-mist">{step.text}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[980px] px-5 py-20 text-center sm:px-8 lg:py-24">
+        <Reveal>
+          <p className="font-display text-[clamp(2rem,5vw,4rem)] font-semibold leading-[1.05] tracking-[-0.035em] text-fog">
+            “Build it. Break it. Understand it. Make it better.”
+          </p>
+          <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.24em] text-dim">
+            Always learning · Always experimenting
+          </p>
+        </Reveal>
+      </section>
+
+      <SubscribeBand />
     </main>
+  );
+}
+
+function ProjectCard({
+  image,
+  eyebrow,
+  title,
+  body,
+  href,
+  link,
+}: {
+  image: string;
+  eyebrow: string;
+  title: string;
+  body: string;
+  href: string;
+  link: string;
+}) {
+  return (
+    <Reveal>
+      <article className="group h-full overflow-hidden rounded-[28px] border border-line bg-ink-900 transition-all duration-300 hover:-translate-y-1 hover:border-line-2 hover:shadow-[0_24px_50px_-36px_rgba(8,22,14,0.55)]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={image}
+          alt=""
+          loading="lazy"
+          className="aspect-[16/8] w-full object-cover transition-transform duration-700 group-hover:scale-[1.025]"
+        />
+        <div className="p-7 sm:p-8">
+          <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-phos">
+            {eyebrow}
+          </p>
+          <h3 className="mt-3 font-display text-3xl font-semibold tracking-tight text-fog">
+            {title}
+          </h3>
+          <p className="mt-3 text-[15px] leading-7 text-mist">{body}</p>
+          <Link
+            href={href}
+            className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-phos transition-colors hover:text-fog"
+          >
+            {link}
+            <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+      </article>
+    </Reveal>
   );
 }

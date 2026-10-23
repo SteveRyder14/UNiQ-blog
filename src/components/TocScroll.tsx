@@ -51,16 +51,18 @@ export default function TocScroll({
   }, [toc]);
 
   return (
-    <ol className="space-y-1 p-2">
+    <ol className="space-y-1">
       {toc.map((h, i) => (
         <li key={h.id}>
           <a
             href={`#${h.id}`}
             data-active={active === h.id}
-            className="toc-link flex gap-3 px-2.5 py-2 font-mono text-[12px] leading-snug text-mist"
+            className="toc-link flex gap-3 px-3 py-2.5 text-[13px] leading-snug text-mist hover:text-fog"
           >
-            <span className="text-dim">{String(i + 1).padStart(2, "0")}</span>
-            <span className="truncate">{h.title}</span>
+            <span className="font-mono text-[10px] leading-5 text-dim">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <span>{h.title}</span>
           </a>
         </li>
       ))}

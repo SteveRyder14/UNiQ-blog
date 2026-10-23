@@ -37,7 +37,7 @@ export default function ScrollTop() {
       }`}
     >
       <svg viewBox="0 0 44 44" className="absolute inset-0 h-full w-full -rotate-90">
-        <circle cx="22" cy="22" r="18" stroke="#1d2733" strokeWidth="2" fill="none" />
+        <circle className="scroll-progress-track" cx="22" cy="22" r="18" stroke="#dbe5d6" strokeWidth="2" fill="none" />
         <circle
           cx="22"
           cy="22"

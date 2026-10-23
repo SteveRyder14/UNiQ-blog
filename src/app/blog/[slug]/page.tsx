@@ -13,9 +13,10 @@ import CommentSection from "@/components/CommentSection";
 import SubscribeBand from "@/components/SubscribeBand";
 import TocScroll from "@/components/TocScroll";
 import PostEngagement from "@/components/PostEngagement";
+import Logo from "@/components/Logo";
 import { getStats } from "@/lib/stats";
-import { IconGitHub, IconClock, IconArrow } from "@/components/icons";
-import { cn, fmtDate, topicAccent } from "@/lib/utils";
+import { IconArrow, IconClock, IconGitHub } from "@/components/icons";
+import { fmtDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -45,201 +46,229 @@ export default async function PostPage({ params }: Params) {
   ]);
 
   return (
-    <main className="pt-14">
-      {/* header */}
-      <section className="grid-bg border-b border-line">
-        <div className="mx-auto max-w-6xl px-4 pb-10 pt-14 sm:px-6">
-          <Reveal variant="uncover">
-            <nav className="flex flex-wrap items-center gap-2 font-mono text-[11.5px] tracking-wider text-dim">
-              <Link href="/" className="transition-colors hover:text-phos">
-                ~/blog
-              </Link>
-              <span>/</span>
-              <span className="text-mist">{post.topic.toLowerCase()}</span>
-              <span>/</span>
-              <span className="truncate text-dim">{post.slug}</span>
-            </nav>
-            <div className="mt-7 flex flex-wrap items-center gap-3 font-mono text-[11px] uppercase tracking-[0.2em]">
-              <span className={cn("border px-2.5 py-1", topicAccent(post.topic))}>
-                {post.topic}
-              </span>
-              {post.featured && (
-                <span className="border border-line-2 px-2.5 py-1 text-mist">
-                  ★ featured
-                </span>
-              )}
-            </div>
-            <h1 className="mt-5 max-w-4xl font-display text-3xl font-semibold leading-[1.12] tracking-tight text-fog sm:text-5xl">
-              {post.title}
-            </h1>
-            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-[12px] text-dim">
-              <span>
-                by <span className="text-phos">UNiQ</span>
-              </span>
-              <span>{fmtDate(post.dateIso)}</span>
-              <span className="flex items-center gap-1.5">
-                <IconClock className="h-3.5 w-3.5" /> {post.readMin} min read
-              </span>
-              <span className="hidden sm:inline">
-                {post.tags.map((t) => `#${t}`).join("  ")}
-              </span>
-            </div>
-          </Reveal>
-        </div>
-      </section>
+    <main className="pt-[72px]">
+      <ReadingProgress />
 
-      <div className="mx-auto grid max-w-6xl gap-12 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,1fr)_280px]">
-        {/* article */}
+      <header className="mx-auto max-w-[980px] px-5 pb-12 pt-14 sm:px-8 lg:pt-20">
+        <Reveal>
+            <nav className="flex flex-wrap items-center gap-2 font-mono text-[11px] text-dim">
+            <Link href="/" className="transition-colors hover:text-fog">
+              ~/journal
+            </Link>
+            <span aria-hidden="true">/</span>
+            <Link href="/archive" className="transition-colors hover:text-fog">
+              archive
+            </Link>
+            <span aria-hidden="true">/</span>
+            <span className="text-phos">{post.topic.toLowerCase()}</span>
+          </nav>
+
+          <div className="mt-9 flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-phos/10 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-phos">
+              {post.topic}
+            </span>
+            {post.featured && (
+              <span className="rounded-full border border-line bg-ink-900 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-mist">
+                Featured
+              </span>
+            )}
+          </div>
+
+          <h1 className="mt-6 font-display text-[clamp(2.7rem,6vw,5.2rem)] font-semibold leading-[0.98] tracking-[-0.045em] text-fog">
+            {post.title}
+          </h1>
+          <p className="mt-7 max-w-3xl text-lg leading-8 text-mist">{post.excerpt}</p>
+
+          <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4 border-y border-line py-5">
+            <div className="flex items-center gap-3">
+              <Logo className="h-11 w-11" />
+              <div>
+                <p className="text-sm font-semibold text-fog">UNiQ</p>
+                <p className="text-xs text-dim">Author</p>
+              </div>
+            </div>
+            <span className="hidden h-8 w-px bg-line sm:block" />
+            <div>
+              <p className="text-sm font-medium text-fog">{fmtDate(post.dateIso)}</p>
+              <p className="text-xs text-dim">Published</p>
+            </div>
+            <div>
+              <p className="flex items-center gap-1.5 text-sm font-medium text-fog">
+                <IconClock className="h-4 w-4" />
+                {post.readMin} minutes
+              </p>
+              <p className="text-xs text-dim">Reading time</p>
+            </div>
+          </div>
+        </Reveal>
+      </header>
+
+      <div className="mx-auto max-w-[1180px] px-5 sm:px-8">
+        <Reveal>
+          <figure className="overflow-hidden rounded-[28px] border border-line-2 bg-ink-900 p-2 shadow-[0_28px_60px_-38px_rgba(8,22,14,0.55)]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={post.cover}
+              alt={post.title}
+              className="aspect-[16/8] w-full rounded-[21px] object-cover"
+            />
+          </figure>
+        </Reveal>
+      </div>
+
+      <div className="mx-auto grid max-w-[1180px] gap-14 px-5 py-14 sm:px-8 lg:grid-cols-[minmax(0,760px)_290px] lg:justify-between lg:py-20">
         <article className="min-w-0">
-          <Reveal variant="uncover">
-            <figure className="relative mb-10 overflow-hidden border border-line">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={post.cover || "/images/cover-checkers.jpg"}
-                alt={post.title}
-                className="photo kenburns aspect-[16/8] w-full object-cover opacity-95"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink-950/60 to-transparent" />
-              <span className="sweep-line" aria-hidden="true" />
-              <figcaption className="absolute bottom-3 left-3 bg-ink-950/80 px-2.5 py-1 font-mono text-[10.5px] tracking-wider text-mist">
-                fig. 01 — {post.topic.toLowerCase()}/{post.slug}
-              </figcaption>
-            </figure>
-          </Reveal>
           <Reveal>
             <div className="md">{renderMarkdown(post.content)}</div>
           </Reveal>
 
           <Reveal>
-            <div className="mt-14 flex items-center gap-4 font-mono text-[11px] uppercase tracking-[0.3em] text-dim">
-              <span className="hairline flex-1" aria-hidden="true" />
-              end of transmission
-              <span className="hairline flex-1" aria-hidden="true" />
-            </div>
-            <div className="mt-8 flex flex-wrap items-center gap-2">
-              {post.tags.map((t) => (
-                <Link
-                  key={t}
-                  href={`/tags/${encodeURIComponent(t)}`}
-                  className="border border-line px-3 py-1.5 font-mono text-[11px] tracking-wider text-mist transition-colors duration-200 hover:border-phos/50 hover:text-phos"
-                >
-                  #{t}
-                </Link>
-              ))}
-            </div>
+            <div className="mt-16 border-t border-line pt-8">
+              <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-dim">
+                Filed under
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {post.tags.map((tag) => (
+                  <Link
+                    key={tag}
+                    href={`/tags/${encodeURIComponent(tag)}`}
+                    className="rounded-full border border-line bg-ink-900 px-3.5 py-2 text-xs font-medium text-mist transition-colors hover:border-phos hover:text-phos"
+                  >
+                    #{tag}
+                  </Link>
+                ))}
+              </div>
 
-            <div className="mt-5 flex flex-wrap items-center gap-2">
-              <PostEngagement
-                slug={post.slug}
-                initialViews={stats.views}
-                initialLikes={stats.likes}
-              />
-              <span className="ml-auto flex gap-2">
-                <a
-                  href="https://github.com/SteveRyder14"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-2 border border-line px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-mist transition-colors hover:border-phos/60 hover:text-phos"
-                >
-                  <IconGitHub className="h-4 w-4" /> github
-                </a>
-                <CopyLink url={`/blog/${post.slug}`} />
-              </span>
+              <div className="mt-8 flex flex-wrap items-center gap-3 rounded-3xl border border-line bg-ink-900/70 p-4 sm:p-5">
+                <PostEngagement
+                  slug={post.slug}
+                  initialViews={stats.views}
+                  initialLikes={stats.likes}
+                />
+                <div className="ml-auto flex flex-wrap gap-2">
+                  <a
+                    href="https://github.com/SteveRyder14"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full border border-line bg-ink-900 px-4 py-2.5 text-xs font-semibold text-mist transition-colors hover:border-line-2 hover:text-fog"
+                  >
+                    <IconGitHub className="h-4 w-4" />
+                    GitHub
+                  </a>
+                  <CopyLink url={`/blog/${post.slug}`} />
+                </div>
+              </div>
             </div>
           </Reveal>
 
           <Reveal>
             <CommentSection
               postId={post.id}
-              initial={dbComments.map((c) => ({
-                id: c.id,
-                name: c.name,
-                body: c.body,
-                createdAt: c.createdAt.toISOString(),
+              initial={dbComments.map((comment) => ({
+                id: comment.id,
+                name: comment.name,
+                body: comment.body,
+                createdAt: comment.createdAt.toISOString(),
               }))}
             />
           </Reveal>
         </article>
 
-        {/* sticky sidebar */}
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <Reveal delay={100}>
-            <div className="border border-line bg-ink-900/70">
-              <div className="border-b border-line px-4 py-2.5 font-mono text-[10.5px] uppercase tracking-[0.24em] text-dim">
-                ./on-this-page
-              </div>
-              {toc.length > 0 ? (
-                <TocScroll toc={toc} />
-              ) : (
-                <p className="p-4 font-mono text-[12px] text-dim">one long rant, no headings.</p>
-              )}
-            </div>
-            <div className="mt-5 border border-line bg-ink-900/70 p-4">
-              <p className="font-mono text-[10.5px] uppercase tracking-[0.24em] text-dim">
-                ./meta
+            <div className="rounded-3xl border border-line bg-ink-900/80 p-5">
+              <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-dim">
+                On this page
               </p>
-              <dl className="mt-3 space-y-2.5 font-mono text-[12px]">
-                <div className="flex justify-between gap-3">
-                  <dt className="text-dim">topic</dt>
-                  <dd className="text-mist">{post.topic}</dd>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="text-dim">published</dt>
-                  <dd className="text-mist">{fmtDate(post.dateIso)}</dd>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="text-dim">read time</dt>
-                  <dd className="text-mist">{post.readMin} min</dd>
-                </div>
-                <div className="flex justify-between gap-3">
-                  <dt className="text-dim">local?</dt>
-                  <dd className="text-phos">yes ✓</dd>
-                </div>
-              </dl>
+              <div className="mt-4">
+                {toc.length > 0 ? (
+                  <TocScroll toc={toc} />
+                ) : (
+                  <p className="text-sm leading-6 text-mist">
+                    This note flows as one continuous piece.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-5 rounded-3xl bg-fog p-6 text-ink-950">
+              <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-ink-950/60">
+                About the author
+              </p>
+              <h2 className="mt-3 font-display text-2xl font-semibold leading-tight">
+                UNiQ opens the hood.
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-ink-950/70">
+                Notes on Android, Linux, local AI, audio and learning by
+                building, breaking and understanding.
+              </p>
+              <Link
+                href="/about"
+                className="mt-5 inline-flex items-center gap-2 text-sm font-semibold"
+              >
+                More about UNiQ
+                <IconArrow className="h-4 w-4" />
+              </Link>
             </div>
           </Reveal>
         </aside>
       </div>
 
-      {/* related */}
       {related.length > 0 && (
-        <section className="border-t border-line">
-          <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+        <section className="border-t border-line bg-ink-900/45">
+          <div className="mx-auto max-w-[1280px] px-5 py-16 sm:px-8 lg:py-20">
             <Reveal>
-              <p className="shimmer font-mono text-[12px] uppercase tracking-[0.3em]">
-                <span className="text-phos">{"//"}</span> keep reading
-              </p>
+              <div className="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-phos">
+                    Keep exploring
+                  </p>
+                  <h2 className="mt-3 font-display text-4xl font-semibold tracking-[-0.03em] text-fog">
+                    Related notes
+                  </h2>
+                </div>
+                <Link href="/archive" className="text-sm font-semibold text-phos hover:text-fog">
+                  Browse the archive →
+                </Link>
+              </div>
             </Reveal>
-            <Reveal
-              stagger
-              variant="up"
-              className="mt-6 grid gap-5 md:grid-cols-3"
-            >
-              {related.map((r) => (
-                <Link
-                  key={r.slug}
-                  href={`/blog/${r.slug}`}
-                  className="lift group relative flex h-full flex-col overflow-hidden border border-line bg-ink-900 p-5 transition-[border-color,transform,box-shadow] duration-300 ease-out hover:border-phos/50"
-                >
-                    <span className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-dim">
-                      {r.topic} · {r.readMin} min
-                    </span>
-                    <h3 className="mt-3 font-display text-[1.05rem] font-semibold leading-snug text-fog transition-colors group-hover:text-phos">
-                      {r.title}
-                    </h3>
-                    <p className="mt-2 line-clamp-2 text-[0.88rem] leading-relaxed text-mist">
-                      {r.excerpt}
-                    </p>
-                    <span className="nudge mt-auto flex items-center gap-2 pt-4 font-mono text-[11px] uppercase tracking-[0.2em] text-phos">
-                      open
-                      <IconArrow className="h-3.5 w-3.5" />
-                    </span>
+
+            <div className="mt-8 grid gap-6 md:grid-cols-3">
+              {related.map((item, index) => (
+                <Reveal key={item.slug} delay={index * 70}>
+                  <Link
+                    href={`/blog/${item.slug}`}
+                    className="story-card group block h-full overflow-hidden rounded-[24px] border border-line bg-ink-900"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={item.cover}
+                      alt=""
+                      loading="lazy"
+                      className="aspect-[16/9] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                    />
+                    <div className="p-6">
+                      <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-phos">
+                        {item.topic}
+                        <span className="ml-2 font-medium normal-case tracking-normal text-dim">
+                          {item.readMin} min
+                        </span>
+                      </p>
+                      <h3 className="mt-3 font-display text-[1.4rem] font-semibold leading-tight text-fog group-hover:text-phos">
+                        {item.title}
+                      </h3>
+                      <p className="mt-2 line-clamp-2 text-sm leading-6 text-mist">
+                        {item.excerpt}
+                      </p>
+                    </div>
                   </Link>
+                </Reveal>
               ))}
-            </Reveal>
+            </div>
           </div>
         </section>
       )}
+
       <SubscribeBand />
     </main>
   );

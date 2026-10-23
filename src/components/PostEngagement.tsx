@@ -86,7 +86,7 @@ export default function PostEngagement({
 
   return (
     <div className="flex items-center gap-2">
-      <span className="flex items-center gap-2 border border-line px-3 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-mist">
+      <span className="flex items-center gap-2 rounded-full border border-line bg-ink-900 px-4 py-2.5 text-xs font-medium text-mist">
         <span aria-hidden className="text-sky">
           ◉
         </span>

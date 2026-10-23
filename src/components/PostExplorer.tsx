@@ -1,182 +1,217 @@
 "use client";
 
-import { useMemo, useState, type MouseEvent as ReactMouseEvent } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import Reveal from "./Reveal";
-import { IconSearch, IconClock, IconArrow } from "./icons";
-import { cn, fmtDateShort, topicAccent } from "@/lib/utils";
+import { IconArrow, IconClock, IconSearch } from "./icons";
+import { cn, fmtDate } from "@/lib/utils";
 import type { PostSummary } from "@/lib/posts";
 
-const TOPICS = ["All", "Android", "Local AI", "Linux", "Audio", "Programming"];
+export type ExplorerPost = PostSummary & { views?: number; likes?: number };
 
-export default function PostExplorer({ posts }: { posts: PostSummary[] }) {
+export default function PostExplorer({ posts }: { posts: ExplorerPost[] }) {
   const [topic, setTopic] = useState("All");
-  const [q, setQ] = useState("");
+  const [query, setQuery] = useState("");
+  const topics = ["All", ...new Set(posts.map((post) => post.topic))];
 
   const filtered = useMemo(() => {
-    const query = q.trim().toLowerCase();
-    return posts.filter((p) => {
-      const okTopic = topic === "All" || p.topic === topic;
-      const okQuery =
-        !query ||
-        p.title.toLowerCase().includes(query) ||
-        p.excerpt.toLowerCase().includes(query) ||
-        p.tags.some((t) => t.toLowerCase().includes(query));
-      return okTopic && okQuery;
+    const q = query.trim().toLowerCase();
+    return posts.filter((post) => {
+      const matchesTopic = topic === "All" || post.topic === topic;
+      const matchesQuery =
+        !q ||
+        post.title.toLowerCase().includes(q) ||
+        post.excerpt.toLowerCase().includes(q) ||
+        post.topic.toLowerCase().includes(q) ||
+        post.tags.some((tag) => tag.toLowerCase().includes(q));
+      return matchesTopic && matchesQuery;
     });
-  }, [posts, topic, q]);
+  }, [posts, query, topic]);
 
-  const clear = () => {
-    setTopic("All");
-    setQ("");
-  };
+  const [featured, ...remaining] = filtered;
 
   return (
     <div>
-      {/* control bar */}
-        <div className="mb-8 flex flex-col gap-4 border border-line bg-ink-900/70 p-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex flex-wrap items-center gap-2">
-          {TOPICS.map((t) => (
+      <div className="mb-10 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible lg:pb-0">
+          {topics.map((item) => (
             <button
-              key={t}
-              onClick={() => setTopic(t)}
+              key={item}
+              onClick={() => setTopic(item)}
               className={cn(
-                "chip border px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.16em]",
-                topic === t
-                  ? "border-phos bg-phos/10 text-phos"
-                  : "border-line text-dim hover:border-line-2 hover:text-mist",
+                "shrink-0 rounded-full border px-4 py-2 text-[13px] font-medium transition-all",
+                topic === item
+                  ? "border-fog bg-fog text-ink-950"
+                  : "border-line bg-ink-900/50 text-mist hover:border-line-2 hover:text-fog",
               )}
             >
-              {t}
+              {item}
             </button>
           ))}
         </div>
-        <label className="relative block w-full md:w-64">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-dim">
-            <IconSearch className="h-4 w-4" />
-          </span>
-          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[11px] text-dim">
-            ⏎
-          </span>
+
+        <label className="relative block shrink-0 lg:w-72">
+          <IconSearch className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-dim" />
           <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="grep the archive…"
-            className="w-full border border-line bg-ink-950 py-2 pl-9 pr-9 font-mono text-[12.5px] text-fog placeholder:text-dim transition-colors duration-200 focus:border-phos/60 focus:bg-ink-900 focus:outline-none"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search notes…"
+            className="w-full rounded-full border border-line bg-ink-900/70 py-3 pl-11 pr-4 text-sm text-fog placeholder:text-dim focus:border-phos focus:outline-none"
           />
         </label>
       </div>
 
-      <p className="mb-6 font-mono text-[11px] uppercase tracking-[0.22em] text-dim">
-        <span className="text-phos">$</span> ls ./notes
-        <span className="mx-2 text-line-2">|</span>
-        {filtered.length} entr{filtered.length === 1 ? "y" : "ies"}
-        {topic !== "All" && <span className="text-ember"> · topic: {topic.toLowerCase()}</span>}
-        {q.trim() && <span className="text-ember"> · grep: &quot;{q.trim()}&quot;</span>}
-      </p>
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-dim">
+          <span className="text-phos" aria-hidden="true">
+            $
+          </span>{" "}
+          ls ./journal
+          <span className="mx-2 text-line-2">|</span>
+          {filtered.length} {filtered.length === 1 ? "note" : "notes"}
+          {topic !== "All" && ` · ${topic}`}
+          {query.trim() && ` · grep "${query.trim()}"`}
+        </p>
+        {(topic !== "All" || query) && (
+          <button
+            onClick={() => {
+              setTopic("All");
+              setQuery("");
+            }}
+            className="text-xs font-semibold text-phos hover:text-fog"
+          >
+            Clear filters
+          </button>
+        )}
+      </div>
 
-      {filtered.length === 0 ? (
-        <div className="border border-dashed border-line-2 px-6 py-20 text-center">
-          <p className="font-mono text-sm text-dim">
-            0 results for this filter.
+      {!featured ? (
+        <div className="rounded-[24px] border border-dashed border-line-2 bg-ink-900/50 px-6 py-20 text-center">
+          <p className="font-display text-2xl font-semibold text-fog">Nothing found</p>
+          <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-mist">
+            Try a different keyword or topic. The notebook is small, but it is
+            growing.
           </p>
           <button
-            onClick={clear}
-            className="mt-4 border border-phos/50 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.2em] text-phos transition-colors hover:bg-phos hover:text-ink-950"
+            onClick={() => {
+              setTopic("All");
+              setQuery("");
+            }}
+            className="mt-6 rounded-full bg-fog px-5 py-2.5 text-sm font-semibold text-ink-950 transition-colors hover:bg-phos"
           >
-            clear filters
+            Show all notes
           </button>
         </div>
       ) : (
-        <div className="grid gap-5 md:grid-cols-2">
-          {filtered.map((p, i) => (
-            <PostCard key={p.slug} post={p} index={i} big={i === 0} />
-          ))}
-        </div>
+        <>
+          <Reveal>
+            <FeaturedCard post={featured} />
+          </Reveal>
+
+          {remaining.length > 0 && (
+            <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {remaining.map((post, index) => (
+                <Reveal key={post.slug} delay={(index % 3) * 70}>
+                  <StoryCard post={post} />
+                </Reveal>
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
 }
 
-function PostCard({
-  post,
-  index,
-  big,
-}: {
-  post: PostSummary;
-  index: number;
-  big: boolean;
-}) {
-  const onMouseMove = (e: ReactMouseEvent<HTMLElement>) => {
-    const el = e.currentTarget as HTMLElement;
-    const r = el.getBoundingClientRect();
-    const mx = ((e.clientX - r.left) / r.width) * 100;
-    const my = ((e.clientY - r.top) / r.height) * 100;
-    el.style.setProperty("--mx", `${mx}%`);
-    el.style.setProperty("--my", `${my}%`);
-    el.style.setProperty("--mxn", `${mx}`);
-    el.style.setProperty("--myn", `${my}`);
-  };
+function FeaturedCard({ post }: { post: ExplorerPost }) {
   return (
-    <Reveal
-      delay={(index % 2) * 80}
-      className={`tilt-wrap ${big ? "md:col-span-2" : ""}`}
-    >
-      <article
-        className="post-card lift tilt group relative h-full overflow-hidden border border-line bg-ink-900"
-        onMouseMove={onMouseMove}
-      >
-        <Link href={`/blog/${post.slug}`} className="flex h-full flex-col">
-          <div className={cn("relative overflow-hidden border-b border-line", big ? "aspect-[21/9]" : "aspect-[16/8]")}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={post.cover || "/images/cover-checkers.jpg"}
-              alt={post.title}
-              loading="lazy"
-              className="photo h-full w-full object-cover opacity-85 group-hover:scale-[1.04]"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-ink-950/80 via-transparent to-transparent" />
-            <span className="absolute left-4 top-4 font-mono text-[11px] tracking-[0.2em] text-phos/90">
-              {post.featured && index === 0
-                ? "● featured"
-                : String(index + 1).padStart(2, "0")}
+    <article data-spot className="featured-card story-card spot group overflow-hidden rounded-[28px] border border-line bg-ink-900 shadow-[0_24px_55px_-38px_rgba(8,22,14,0.5)]">
+      <Link href={`/blog/${post.slug}`} className="grid lg:grid-cols-[1.08fr_0.92fr]">
+        <div className="relative min-h-[300px] overflow-hidden lg:min-h-[430px]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={post.cover}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.025]"
+          />
+          <span className="absolute left-5 top-5 rounded-full bg-ink-950/90 px-3.5 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-fog shadow-sm backdrop-blur">
+            Latest featured note
+          </span>
+        </div>
+
+        <div className="flex flex-col justify-center p-7 sm:p-10 lg:p-12">
+          <Meta post={post} />
+          <h3 className="mt-5 font-display text-[2rem] font-semibold leading-[1.05] tracking-[-0.03em] text-fog transition-colors group-hover:text-phos sm:text-4xl">
+            {post.title}
+          </h3>
+          <p className="mt-5 line-clamp-4 text-[15px] leading-7 text-mist">
+            {post.excerpt}
+          </p>
+          <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
+            <span className="inline-flex items-center gap-3 text-sm font-semibold text-fog">
+              <span className="grid h-9 w-9 place-items-center rounded-full bg-phos text-ink-950 transition-transform duration-300 group-hover:translate-x-1">
+                <IconArrow className="h-4 w-4" />
+              </span>
+              Read the full note
             </span>
-            {big && (
-              <span className="absolute bottom-4 left-4 border border-phos/60 bg-ink-950/80 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.24em] text-phos">
-                latest experiment
-              </span>
-            )}
-          </div>
-          <div className="flex flex-1 flex-col p-5 sm:p-6">
-            <div className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.18em]">
-              <span className={cn("border px-2 py-0.5", topicAccent(post.topic))}>
-                {post.topic}
-              </span>
-              <span className="text-dim">{fmtDateShort(post.dateIso)}</span>
-            </div>
-            <h3
-              className={cn(
-                "mt-3.5 font-display font-semibold leading-snug text-fog transition-colors group-hover:text-phos",
-                big ? "text-2xl sm:text-[1.75rem]" : "text-xl",
+            <span className="flex items-center gap-3 text-[11px] font-medium text-dim">
+              {typeof post.likes === "number" && post.likes > 0 && (
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="text-phos" aria-hidden="true">★</span>
+                  {post.likes.toLocaleString()} likes
+                </span>
               )}
-            >
-              {post.title}
-            </h3>
-            <p className={cn("mt-3 text-[0.95rem] leading-relaxed text-mist", big ? "line-clamp-3" : "line-clamp-2")}>
-              {post.excerpt}
-            </p>
-            <div className="mt-auto flex items-center justify-between pt-5 font-mono text-[11px] uppercase tracking-[0.18em] text-dim">
-              <span className="flex items-center gap-2">
-                <IconClock className="h-3.5 w-3.5" />
-                {post.readMin} min read
-              </span>
-              <span className="flex items-center gap-2 text-phos opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 md:-translate-x-2">
-                read it <IconArrow className="h-3.5 w-3.5" />
-              </span>
-            </div>
+              <span className="h-1 w-1 rounded-full bg-line-2" aria-hidden="true" />
+              <span>{post.readMin} min read</span>
+            </span>
           </div>
-        </Link>
-      </article>
-    </Reveal>
+        </div>
+      </Link>
+    </article>
+  );
+}
+
+function StoryCard({ post }: { post: ExplorerPost }) {
+  return (
+    <article data-spot className="story-card spot group h-full overflow-hidden rounded-[24px] border border-line bg-ink-900">
+      <Link href={`/blog/${post.slug}`} className="flex h-full flex-col">
+        <div className="aspect-[16/10] overflow-hidden bg-ink-850">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={post.cover}
+            alt=""
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
+          />
+        </div>
+        <div className="flex flex-1 flex-col p-6">
+          <Meta post={post} />
+          <h3 className="mt-4 font-display text-[1.45rem] font-semibold leading-[1.12] tracking-[-0.02em] text-fog transition-colors group-hover:text-phos">
+            {post.title}
+          </h3>
+          <p className="mt-3 line-clamp-3 text-sm leading-6 text-mist">{post.excerpt}</p>
+          <div className="mt-auto flex items-center justify-between pt-7 text-xs text-dim">
+            <span className="inline-flex items-center gap-1.5">
+              <IconClock className="h-3.5 w-3.5" />
+              {post.readMin} min read
+            </span>
+            <span className="inline-flex items-center gap-1 font-semibold text-phos">
+              Read
+              <IconArrow className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+            </span>
+          </div>
+        </div>
+      </Link>
+    </article>
+  );
+}
+
+function Meta({ post }: { post: ExplorerPost }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em]">
+      <span className="text-phos">{post.topic}</span>
+      <span className="h-1 w-1 rounded-full bg-line-2" />
+      <span className="font-medium normal-case tracking-normal text-dim">{fmtDate(post.dateIso)}</span>
+    </div>
   );
 }
